@@ -1,0 +1,23 @@
+[en]
+BALL_MAINMENU = Main menu
+BALL_BALLMENU = Ball menu
+BALL_NETMENU = Net menu
+
+BALL_LOAD = Load
+BALL_CREATE = Create
+BALL_DELETE = Delete
+BALL_SAVE = Save
+
+BALL_SUCCEED = Succeeded to %L %L!
+BALL_FAILED = Failed to %L %L!
+BALL_BALL = ball
+BALL_NET = net
+
+BALL_MAXNETS = Max amount of nets (%d) has been set!
+BALL_SETORIGIN1 = Set the origin for the TOP-RIGHT corner of net.
+BALL_SETORIGIN2 = Set the origin for the BOTTOM-LEFT corner of net.
+BALL_FAILEDSTART = There are no nets, ball defined or no field for this map, ask admin to create!
+BALL_USINGMENU = Admin %s is using this menu at the moment!
+
+BALL_SCORED = %s scored goal^nfrom %d units!
+BALL_GOTBALL = ** YOU HAVE THE BALL! **

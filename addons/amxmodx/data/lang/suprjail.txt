@@ -1,0 +1,98 @@
+[en]
+JAIL_TWIN = Prisoners win!
+JAIL_CTWIN = Guards win!
+
+JAIL_GUARDS = Guards
+JAIL_PRISONERS = Prisoners
+
+JAIL_SHOW_SIMON = Simon: %s
+JAIL_SHOW_KILLEDSIMON = %s killed Simon %s
+JAIL_SHOW_WANTED = Prisoners wanted:
+JAIL_SHOW_FREEBIES = Freebies:
+JAIL_SHOW_COUNT = Day: %d
+JAIL_SHOW_DAY = Current day: %s
+JAIL_SHOW_GAME = Current game: %s
+
+JAIL_SIMON_YES = ^3%s^1 is the new ^4Simon^1!
+JAIL_SIMON_ALREADY = ^3%s^1 already is the ^4Simon^1!
+JAIL_SIMON_NO = ^3%s^1 is no longer the ^4Simon^1!
+JAIL_SIMON_MUSTBE = You must be ^4Simon^1 to use this command!
+JAIL_SIMON_ADMIN = You must be ^4Simon or Admin^1 to use this command!
+
+JAIL_MUSTBECT = You must be on ^3%L^1 team to use this!
+JAIL_GAMENOTSTARTED = Game hasn't started yet, wait a bit!
+JAIL_NODAYSADDED = There are no days added!
+JAIL_NOGAMESADDED = There are no games added!
+
+JAIL_EVENTON = ^4%s^1 has been started by ^3%s^1.
+JAIL_EVENTOFF = ^4%s^1 has been ended by ^3%s^1.
+JAIL_EVENTEND = End %s
+JAIL_EVENTALREADY = There is already ^4%s^1 in progress, end it by writing ^3/%s^1.
+
+JAIL_MENUMENU = Menu
+JAIL_TRANSFER = Transfer
+JAIL_TRANSFER_C = ^3%s^1 has been transfered to ^3%L^1 team by ^3%s^1!
+JAIL_GIVEMIC = Give speak
+JAIL_GIVEMIC_C = ^3%s^1 has changed talkmode to player ^3%s^1!
+JAIL_ALLOWNADES = Allow nades
+JAIL_ALLOWNADES_C = ^3%s^1 has changed nade pickup for player ^3%s^1!
+JAIL_ALLOWNADES_CA = ^3%s^1 has changed nade pickup for all players!
+JAIL_REVERSE = Games/days for: %L
+JAIL_REVERSE_C = ^3%s^1 changed game/day playing! Now for ^3%L^1!
+
+JAIL_GAMEMENU = Game menu
+JAIL_GAME0 = Box
+JAIL_GAME0_TOOMUCH = There are too many players ^4%d^1, needed ^4%d^1.
+
+JAIL_GAME1 = Duel
+JAIL_GAME1_MENU1 = Box duel
+JAIL_GAME1_MENU2 = Pistol duel
+JAIL_GAME1_MENU3 = Scout duel
+JAIL_GAME1_MENU4 = Grenade duel
+JAIL_GAME1_MENU5 = Sniper duel
+JAIL_GAME1_EXTRA1 = ^3%s^1 will be using ^4%s^1 to deal with ^3%s^1!
+JAIL_GAME1_EXTRA2 = ^3%s^1 won ^4%s^1 against ^3%s^1!
+JAIL_GAME1_EXTRA3 = ^3%s^1 has choosen ^4%L^1!
+JAIL_GAME1_EXTRA4 = You are not allowed to use this because you are ^4wanted^1!
+
+JAIL_GAME2 = Words game
+JAIL_GAME2_WON = Player ^3%s^1 won the ^4%s^1 with word ^4%s^1!
+JAIL_GAME2_ERROR = Something went wrong, try again!
+JAIL_GAME3 = Freeze them
+JAIL_GAME4 = Painting game
+JAIL_GAME4_GIVE = Allow someone else paint
+JAIL_GAME4_TAKE = ^3%s^1 allowed player ^3%s^1 to ^4paint^1!
+JAIL_GAME5 = Football
+
+JAIL_DAYMENU = Day menu
+JAIL_DAY0 = Freeday
+JAIL_DAY0_EXTRA1 = ^3%s^1 has given player ^3%s^1 ^4%s^1!
+JAIL_DAY0_EXTRA2 = ^4%s^1 for player ^3%s^1 has ended, he is ^4fugitive^1 now!
+JAIL_DAY0_AWARDED = You have been awarded with ^4%s^1!
+JAIL_DAY0_MENU1 = Give one
+JAIL_DAY0_MENU2 = Give all
+JAIL_DAY0_JOIN = Do you want to join %s?
+
+JAIL_DAY1 = Knife day
+JAIL_DAY2 = Protection day
+JAIL_DAY3 = Snow day
+JAIL_DAY4 = Shark day
+JAIL_DAY5 = Nightcrawler day
+JAIL_DAY6 = Gang day
+JAIL_DAY6_EXTRA1 = There must be at least 4 players to start ^4%L^1!
+JAIL_DAY7 = Jedi day
+JAIL_DAY8 = Sparta day
+JAIL_DAY9 = HNS day
+JAIL_DAY10 = Zombie day
+JAIL_DAY10_EXTRA1 = The infection has spread, ^3watch out^1!
+JAIL_DAY10_EXTRA2 = Zombies have infected the prison, ^3world is doomed^1...
+JAIL_DAY10_EXTRA3 = Thanks to the brave ^4%s^1 server survivors, ^3the world is saved^1!
+
+JAIL_DUEL0 = RPG duel
+JAIL_DUEL0_EXTRA1 = Switched to normal mode
+JAIL_DUEL0_EXTRA2 = Switched to user-following mode
+
+JAIL_OPENEDCELLS = ^3%s^1 opened cells!
+JAIL_CLOSEDCELLS = ^3%s^1 closed cells!
+JAIL_CTLIMIT = Max amount of Guards is %d!
+JAIL_CANTCHANGE = ^3You can't change team!
