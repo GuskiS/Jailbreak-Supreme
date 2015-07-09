@@ -6,10 +6,6 @@
 #include <timer_controller>
 #include <jailbreak>
 
-#if defined JAIL_HAMBOTS
-#include <cs_ham_bots_api>
-#endif
-
 #define TASK_ROUNDTIME 1111
 #define TASK_GIVERANDOM 2222
 
@@ -22,551 +18,546 @@ new g_pGameModeForward;
 
 public plugin_init()
 {
-	register_plugin("Supreme JailBreak", JAIL_VERSION, JAIL_AUTHOR);
-	register_cvar("jail_server_version", JAIL_VERSION, FCVAR_SERVER|FCVAR_EXTDLL|FCVAR_SPONLY);
+  register_plugin("Supreme JailBreak", JAIL_VERSION, JAIL_AUTHOR);
+  register_cvar("jail_server_version", JAIL_VERSION, FCVAR_SERVER|FCVAR_EXTDLL|FCVAR_SPONLY);
 
-	cvar_preparation_time = register_cvar("jail_preparation_time", "5");//seconds
-	cvar_pick_time = register_cvar("jail_pick_time", "30");//pick time
-	cvar_pick_what = register_cvar("jail_pick_what", "3");//0-none, 1-random simon, 2-freeday, 3-random choice between 1 and 2
-	cvar_roundtime = register_cvar("jail_roundtime", "10");//MINUTES
-	register_cvar("jail_admin_access", "1"); // should admins be allowed access things without being simon?
-	cvar_crowbar_count = register_cvar("jail_crowbar_count", "1");
-	cvar_simon_steps = register_cvar("jail_simon_steps", "1");
+  cvar_preparation_time = register_cvar("jail_preparation_time", "5");//seconds
+  cvar_pick_time = register_cvar("jail_pick_time", "30");//pick time
+  cvar_pick_what = register_cvar("jail_pick_what", "3");//0-none, 1-random simon, 2-freeday, 3-random choice between 1 and 2
+  cvar_roundtime = register_cvar("jail_roundtime", "10");//MINUTES
+  register_cvar("jail_admin_access", "1"); // should admins be allowed access things without being simon?
+  cvar_crowbar_count = register_cvar("jail_crowbar_count", "1");
+  cvar_simon_steps = register_cvar("jail_simon_steps", "1");
 
-	set_msg_block(get_user_msgid("ClCorpse"), BLOCK_SET);
-	register_event("ClCorpse", "Message_ClCorpse", "a", "10=0");
-	register_event("TextMsg", "Event_RestartRound", "a", "2&#Game_C", "2&#Game_w");
-	register_event("HLTV", "Event_NewRound", "a", "1=0", "2=0");
-	register_logevent("Event_StartRound", 2, "1=Round_Start");
-	register_logevent("Event_EndRound", 2, "1=Round_End");
+  set_msg_block(get_user_msgid("ClCorpse"), BLOCK_SET);
+  register_event("ClCorpse", "Message_ClCorpse", "a", "10=0");
+  register_event("TextMsg", "Event_RestartRound", "a", "2&#Game_C", "2&#Game_w");
+  register_event("HLTV", "Event_NewRound", "a", "1=0", "2=0");
+  register_logevent("Event_StartRound", 2, "1=Round_Start");
+  register_logevent("Event_EndRound", 2, "1=Round_End");
 
-	//RegisterHam(Ham_Spawn, "player", "Ham_Spawn_post", 1);
-	RegisterHam(Ham_Killed, "player", "Ham_Killed_pre", 0);
-	RegisterHam(Ham_Killed, "player", "Ham_Killed_post", 1);
-	RegisterHam(Ham_TakeDamage, "player", "Ham_TakeDamage_pre", 0);
-#if defined JAIL_HAMBOTS
-	//RegisterHamBots(Ham_Spawn, "Ham_Spawn_post", 1);
-	RegisterHamBots(Ham_Killed, "Ham_Killed_pre", 0);
-	RegisterHamBots(Ham_Killed, "Ham_Killed_post", 1);
-	RegisterHamBots(Ham_TakeDamage, "Ham_TakeDamage_pre", 0);
-#endif
+  //RegisterHam(Ham_Spawn, "player", "Ham_Spawn_post", 1);
+  RegisterHamPlayer(Ham_Killed, "Ham_Killed_pre", 0);
+  RegisterHamPlayer(Ham_Killed, "Ham_Killed_post", 1);
+  RegisterHamPlayer(Ham_TakeDamage, "Ham_TakeDamage_pre", 0);
 
-	set_client_commands("simon", "set_player_simon");
+  set_client_commands("simon", "set_player_simon");
 
-	g_pGameModeForward = CreateMultiForward("jail_gamemode", ET_IGNORE, FP_CELL);
-	register_dictionary("jailbreak.txt");
+  g_pGameModeForward = CreateMultiForward("jail_gamemode", ET_IGNORE, FP_CELL);
+  register_dictionary("jailbreak.txt");
 }
 
 public plugin_natives()
 {
-	register_library("jailbreak");
-	register_native("jail_get_gamemode", "_get_gamemode");
-	register_native("jail_set_gamemode", "_set_gamemode");
-	register_native("jail_get_playerdata", "_get_playerdata");
-	register_native("jail_set_playerdata", "_set_playerdata");
-	register_native("jail_get_globalinfo", "_get_globalinfo");
-	register_native("jail_set_globalinfo", "_set_globalinfo");
-	register_native("jail_get_roundtime", "_get_roundtime");
-	register_native("jail_player_crowbar", "_player_crowbar");
+  register_library("jailbreak");
+  register_native("jail_get_gamemode", "_get_gamemode");
+  register_native("jail_set_gamemode", "_set_gamemode");
+  register_native("jail_get_playerdata", "_get_playerdata");
+  register_native("jail_set_playerdata", "_set_playerdata");
+  register_native("jail_get_globalinfo", "_get_globalinfo");
+  register_native("jail_set_globalinfo", "_set_globalinfo");
+  register_native("jail_get_roundtime", "_get_roundtime");
+  register_native("jail_player_crowbar", "_player_crowbar");
 }
 
 public plugin_cfg()
 {
-	auto_exec_config("jailbreak", true);
-	g_fRoundTime = get_pcvar_float(cvar_roundtime);
+  auto_exec_config("jailbreak", true);
+  g_fRoundTime = get_pcvar_float(cvar_roundtime);
 }
 
 public plugin_end()
 {
-	jail_game_forceend(get_global_info(GI_GAME));
-	jail_day_forceend(get_global_info(GI_DAY));
+  jail_game_forceend(get_global_info(GI_GAME));
+  jail_day_forceend(get_global_info(GI_DAY));
 }
 
 public client_disconnect(id)
 {
-	if(get_player_data(id, PD_WANTED))
-		set_global_info(GI_WANTED, get_global_info(GI_WANTED)-1);
+  if(get_player_data(id, PD_WANTED))
+    set_global_info(GI_WANTED, get_global_info(GI_WANTED)-1);
 
-	reset_user_one(id);
+  reset_user_one(id);
 }
 
 public client_putinserver(id)
 {
-	reset_user_one(id);
-	set_task(11.0, "startup_info", id);
+  reset_user_one(id);
+  set_task(11.0, "startup_info", id);
 }
 
 public jail_day_start()
 {
-	remove_my_tasks(1, 0);
+  remove_my_tasks(1, 0);
 }
 
 public jail_game_start()
 {
-	remove_my_tasks(1, 0);
+  remove_my_tasks(1, 0);
 }
 
 public startup_info(id)
 {
-	ColorChat(id, NORMAL, "%s Mod created by %s, skype:guskis1, version: %s!", JAIL_TAG, JAIL_AUTHOR, JAIL_VERSION);
+  ColorChat(id, NORMAL, "%s Mod created by %s, skype:guskis1, version: %s!", JAIL_TAG, JAIL_AUTHOR, JAIL_VERSION);
 }
 
 public Event_RestartRound()
 {
-	if(get_game_mode() != GAME_RESTARTING)
-	{
-		reset_user_all();
-		reset_global_info();
-		set_global_info(GI_DAYCOUNT, 0);
-		set_game_mode(GAME_RESTARTING);
-	}
+  if(get_game_mode() != GAME_RESTARTING)
+  {
+    reset_user_all();
+    reset_global_info();
+    set_global_info(GI_DAYCOUNT, 0);
+    set_game_mode(GAME_RESTARTING);
+  }
 }
 
 public Event_EndRound()
 {
-	if(get_game_mode() != GAME_ENDED)
-	{
-		set_game_mode(GAME_ENDED);
-	}
+  if(get_game_mode() != GAME_ENDED)
+  {
+    set_game_mode(GAME_ENDED);
+  }
 }
 
 public Event_NewRound()
 {
-	if(get_game_mode() != GAME_PREPARING)
-	{
-		set_global_info(GI_DAYCOUNT, get_global_info(GI_DAYCOUNT)+1);
-		new cvar = get_pcvar_num(cvar_preparation_time);
-		if(!cvar)
-			set_pcvar_num(cvar_preparation_time, cvar = 1);
-		g_fFreezeTime = float(cvar);
-		set_task(0.1, "set_timer");
+  if(get_game_mode() != GAME_PREPARING)
+  {
+    set_global_info(GI_DAYCOUNT, get_global_info(GI_DAYCOUNT)+1);
+    new cvar = get_pcvar_num(cvar_preparation_time);
+    if(!cvar)
+      set_pcvar_num(cvar_preparation_time, cvar = 1);
+    g_fFreezeTime = float(cvar);
+    set_task(0.1, "set_timer");
 
-		g_fRoundTime = get_pcvar_float(cvar_roundtime);
-		g_fRoundStart = get_gametime();
-		reset_user_all();
-		reset_global_info();
+    g_fRoundTime = get_pcvar_float(cvar_roundtime);
+    g_fRoundStart = get_gametime();
+    reset_user_all();
+    reset_global_info();
 
-		set_game_mode(GAME_PREPARING);
-	}
+    set_game_mode(GAME_PREPARING);
+  }
 }
 
 public set_timer()
-	RoundTimerSet(0, get_pcvar_num(cvar_preparation_time));
+  RoundTimerSet(0, get_pcvar_num(cvar_preparation_time));
 
 public Event_StartRound()
 {
-	remove_my_tasks(1, 1);
+  remove_my_tasks(1, 1);
 
-	if(get_pcvar_num(cvar_pick_what))
-		set_task(get_pcvar_float(cvar_pick_time)+get_pcvar_float(cvar_preparation_time), "set_player_pick", TASK_GIVERANDOM+get_pcvar_num(cvar_pick_what));
-	set_task(get_pcvar_float(cvar_preparation_time), "do_the_magic", TASK_ROUNDTIME);
+  if(get_pcvar_num(cvar_pick_what))
+    set_task(get_pcvar_float(cvar_pick_time)+get_pcvar_float(cvar_preparation_time), "set_player_pick", TASK_GIVERANDOM+get_pcvar_num(cvar_pick_what));
+  set_task(get_pcvar_float(cvar_preparation_time), "do_the_magic", TASK_ROUNDTIME);
 }
 
 public do_the_magic()
 {
-	RoundTimerSet(floatround(g_fRoundTime));
+  RoundTimerSet(floatround(g_fRoundTime));
 
-	new num, id;
-	static players[32];
-	get_players(players, num, "ae", "TERRORIST");
-	new cvar = get_pcvar_num(cvar_crowbar_count);
-	if(cvar > 0 && num > 1)
-	{
-		for(new i = 0; i < cvar; i++)
-		{
-			id = 0;
-			if(i >= num)
-				break;
+  new num, id;
+  static players[32];
+  get_players(players, num, "ae", "TERRORIST");
+  new cvar = get_pcvar_num(cvar_crowbar_count);
+  if(cvar > 0 && num > 1)
+  {
+    for(new i = 0; i < cvar; i++)
+    {
+      id = 0;
+      if(i >= num)
+        break;
 
-			while(id == 0)
-			{
-				id = players[random(num)];
-				if(get_player_data(id, PD_CROWBAR))
-					id = 0;
-			}
+      while(id == 0)
+      {
+        id = players[random(num)];
+        if(get_player_data(id, PD_CROWBAR))
+          id = 0;
+      }
 
-			set_player_data(id, PD_CROWBAR, true);
-			ExecuteHamB(Ham_Item_Deploy, find_ent_by_owner(-1, "weapon_knife", id));
-		}
-	}
+      set_player_data(id, PD_CROWBAR, true);
+      ExecuteHamB(Ham_Item_Deploy, find_ent_by_owner(-1, "weapon_knife", id));
+    }
+  }
 
-	set_game_mode(GAME_STARTED);
+  set_game_mode(GAME_STARTED);
 }
 
 public set_player_pick(taskid)
 {
-	new randomnum;
-	if(get_pcvar_num(cvar_pick_what) == 3)
-		randomnum = random_num(1, 2);
-	else randomnum = get_pcvar_num(cvar_pick_what);
+  new randomnum;
+  if(get_pcvar_num(cvar_pick_what) == 3)
+    randomnum = random_num(1, 2);
+  else randomnum = get_pcvar_num(cvar_pick_what);
 
-	switch(randomnum)
-	{
-		case 1:
-		{
-			new num, id;
-			static players[32];
-			get_players(players, num, "ae", "CT");
-			if(num)
-			{
-				id = players[random(num)];
-				set_player_simon(id);
-			}
-		}
-		case 2:
-		{
-			if(!g_iFreeday[0])
-				formatex(g_iFreeday, charsmax(g_iFreeday), "%L", LANG_PLAYER, "JAIL_DAY0");
-			jail_day_byname(0, g_iFreeday, 0);
-		}
-	}
+  switch(randomnum)
+  {
+    case 1:
+    {
+      new num, id;
+      static players[32];
+      get_players(players, num, "ae", "CT");
+      if(num)
+      {
+        id = players[random(num)];
+        set_player_simon(id);
+      }
+    }
+    case 2:
+    {
+      if(!g_iFreeday[0])
+        formatex(g_iFreeday, charsmax(g_iFreeday), "%L", LANG_PLAYER, "JAIL_DAY0");
+      jail_day_byname(0, g_iFreeday, 0);
+    }
+  }
 }
 
 public set_player_simon(id)
 {
-	if(is_user_alive(id))
-	{
-		if(cs_get_user_team(id) == CS_TEAM_CT)
-		{
-			static name[32];
-			new simon = get_global_info(GI_SIMON);
-			if(!simon)
-			{
-				remove_my_tasks(1, 0);
-				set_user_simon(id, true, false, true);
-			}
-			else 
-			{
-				if(simon == id)
-					set_user_simon(id, false, false, true);
-				else
-				{
-					get_user_name(simon, name, charsmax(name));
-					ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_SIMON_ALREADY", name);
-				}
-			}
-		}
-		else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_MUSTBECT");
-	}
+  if(is_user_alive(id))
+  {
+    if(cs_get_user_team(id) == CS_TEAM_CT)
+    {
+      static name[32];
+      new simon = get_global_info(GI_SIMON);
+      if(!simon)
+      {
+        remove_my_tasks(1, 0);
+        set_user_simon(id, true, false, true);
+      }
+      else
+      {
+        if(simon == id)
+          set_user_simon(id, false, false, true);
+        else
+        {
+          get_user_name(simon, name, charsmax(name));
+          ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_SIMON_ALREADY", name);
+        }
+      }
+    }
+    else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_MUSTBECT");
+  }
 }
 
 public Ham_Killed_pre(victim, killer, shouldgib)
 {
-	if(!is_user_connected(victim))
-		return HAM_IGNORED;
+  if(!is_user_connected(victim))
+    return HAM_IGNORED;
 
-	if(get_player_data(victim, PD_SIMON))
-	{
-		//set_global_info(GI_CANTSIMON, true);
-		set_user_simon(victim, false, killer, true);
-	}
-	else if(get_player_data(victim, PD_WANTED))
-	{
-		set_global_info(GI_WANTED, get_global_info(GI_WANTED)-1);
-		set_player_data(victim, PD_WANTED, false);
-	}
+  if(get_player_data(victim, PD_SIMON))
+  {
+    //set_global_info(GI_CANTSIMON, true);
+    set_user_simon(victim, false, killer, true);
+  }
+  else if(get_player_data(victim, PD_WANTED))
+  {
+    set_global_info(GI_WANTED, get_global_info(GI_WANTED)-1);
+    set_player_data(victim, PD_WANTED, false);
+  }
 
-	return HAM_IGNORED;
+  return HAM_IGNORED;
 }
 
 public Ham_Killed_post(victim, killer, shouldgib)
-	if(shouldgib == 2)
-		g_iHideBody[victim] = true;
+  if(shouldgib == 2)
+    g_iHideBody[victim] = true;
 
 public Ham_TakeDamage_pre(victim, inflictor, attacker, Float:damage, DamageBits)
 {
-	if(is_user_alive(attacker))
-	{
-		if(get_t_attack_ct(attacker, victim) && !get_player_data(attacker, PD_HAMBLOCK))
-		{
-			if(!g_iFreeday[0])
-				formatex(g_iFreeday, charsmax(g_iFreeday), "%L", LANG_PLAYER, "JAIL_DAY0");
+  if(is_user_alive(attacker))
+  {
+    if(get_t_attack_ct(attacker, victim) && !get_player_data(attacker, PD_HAMBLOCK))
+    {
+      if(!g_iFreeday[0])
+        formatex(g_iFreeday, charsmax(g_iFreeday), "%L", LANG_PLAYER, "JAIL_DAY0");
 
-			new fd = jail_game_getid(g_iFreeday);
-			if(fd != get_global_info(GI_DAY) && get_player_data(attacker, PD_FREEDAY))
-				jail_player_freebie(attacker, false, false);
+      new fd = jail_game_getid(g_iFreeday);
+      if(fd != get_global_info(GI_DAY) && get_player_data(attacker, PD_FREEDAY))
+        jail_player_freebie(attacker, false, false);
 
-			set_player_data(attacker, PD_WANTED, true);
-			set_global_info(GI_WANTED, get_global_info(GI_WANTED)+1);
-			entity_set_int(attacker, EV_INT_skin, 1);
-			set_player_data(attacker, PD_SKIN, 1);
-			if(get_global_info(GI_FREEPASS) == attacker)
-				set_global_info(GI_FREEPASS, 0);
-		}
+      set_player_data(attacker, PD_WANTED, true);
+      set_global_info(GI_WANTED, get_global_info(GI_WANTED)+1);
+      entity_set_int(attacker, EV_INT_skin, 1);
+      set_player_data(attacker, PD_SKIN, 1);
+      if(get_global_info(GI_FREEPASS) == attacker)
+        set_global_info(GI_FREEPASS, 0);
+    }
 
-		if(attacker == inflictor && get_user_weapon(attacker) == CSW_KNIFE && get_player_data(attacker, PD_CROWBAR) && cs_get_user_team(victim) != cs_get_user_team(attacker))
-		{
-			SetHamParamFloat(4, damage * 25.0);
-			return HAM_HANDLED;
-		}
-	}
+    if(attacker == inflictor && get_user_weapon(attacker) == CSW_KNIFE && get_player_data(attacker, PD_CROWBAR) && cs_get_user_team(victim) != cs_get_user_team(attacker))
+    {
+      SetHamParamFloat(4, damage * 25.0);
+      return HAM_HANDLED;
+    }
+  }
 
-	return HAM_IGNORED;
+  return HAM_IGNORED;
 }
 
 public client_PostThink(id)
 {
-	if(get_global_info(GI_SIMON) != id || !get_pcvar_num(cvar_simon_steps) || !is_user_alive(id) ||	!(entity_get_int(id, EV_INT_flags) & FL_ONGROUND) || entity_get_int(id, EV_ENT_groundentity))
-		return PLUGIN_CONTINUE;
+  if(get_global_info(GI_SIMON) != id || !get_pcvar_num(cvar_simon_steps) || !is_user_alive(id) ||	!(entity_get_int(id, EV_INT_flags) & FL_ONGROUND) || entity_get_int(id, EV_ENT_groundentity))
+    return PLUGIN_CONTINUE;
 
-	static Float:originNew[3], Float:originLast[3];
-	entity_get_vector(id, EV_VEC_origin, originNew);
-	if(get_distance_f(originNew, originLast) < 32.0)
-		return PLUGIN_CONTINUE;
+  static Float:originNew[3], Float:originLast[3];
+  entity_get_vector(id, EV_VEC_origin, originNew);
+  if(get_distance_f(originNew, originLast) < 32.0)
+    return PLUGIN_CONTINUE;
 
-	xs_vec_copy(originNew, originLast);
-	if(entity_get_int(id, EV_INT_button) & IN_DUCK)
-		originNew[2] -= 18.0;
-	else originNew[2] -= 36.0;
+  xs_vec_copy(originNew, originLast);
+  if(entity_get_int(id, EV_INT_button) & IN_DUCK)
+    originNew[2] -= 18.0;
+  else originNew[2] -= 36.0;
 
-	message_begin(MSG_BROADCAST, SVC_TEMPENTITY);
-	write_byte(TE_WORLDDECAL);
-	write_coord(floatround(originNew[0]));
-	write_coord(floatround(originNew[1]));
-	write_coord(floatround(originNew[2]));
-	write_byte(105);
-	message_end();
+  message_begin(MSG_BROADCAST, SVC_TEMPENTITY);
+  write_byte(TE_WORLDDECAL);
+  write_coord(floatround(originNew[0]));
+  write_coord(floatround(originNew[1]));
+  write_coord(floatround(originNew[2]));
+  write_byte(105);
+  message_end();
 
-	return PLUGIN_CONTINUE;
+  return PLUGIN_CONTINUE;
 }
 
 public Message_ClCorpse()
 {
-	if(get_game_mode() != GAME_STARTED)
-		return;
+  if(get_game_mode() != GAME_STARTED)
+    return;
 
-	new id = read_data(12);
-	if(g_iHideBody[id])
-		return;
+  new id = read_data(12);
+  if(g_iHideBody[id])
+    return;
 
-	static Float:origin[3], model[32];
-	read_data(1, model, charsmax(model));
-	origin[0] = read_data(2)/128.0;
-	origin[1] = read_data(3)/128.0;
-	origin[2] = read_data(4)/128.0;
-	new seq = read_data(9);
+  static Float:origin[3], model[32];
+  read_data(1, model, charsmax(model));
+  origin[0] = read_data(2)/128.0;
+  origin[1] = read_data(3)/128.0;
+  origin[2] = read_data(4)/128.0;
+  new seq = read_data(9);
 
-	create_body(id, origin, model, seq);
+  create_body(id, origin, model, seq);
 }
 
 public create_body(id, Float:origin[3], model[], seq)
 {
-	new ent = create_entity("info_target");
-	entity_set_string(ent, EV_SZ_classname, "dead_body");
+  new ent = create_entity("info_target");
+  entity_set_string(ent, EV_SZ_classname, "dead_body");
 
-	static out[64];
-	formatex(out, charsmax(out), "models/player/%s/%s.mdl", model, model);
-	entity_set_model(ent, out);
-	entity_set_origin(ent, origin);
+  static out[64];
+  formatex(out, charsmax(out), "models/player/%s/%s.mdl", model, model);
+  entity_set_model(ent, out);
+  entity_set_origin(ent, origin);
 
-	static Float:angle[3];
-	entity_get_vector(id, EV_VEC_angles, angle);
+  static Float:angle[3];
+  entity_get_vector(id, EV_VEC_angles, angle);
 
-	entity_set_float(ent, EV_FL_frame, 255.0);
-	entity_set_int(ent, EV_INT_sequence, seq);
-	entity_set_vector(ent, EV_VEC_angles, angle);
-	entity_set_int(ent, EV_INT_movetype, MOVETYPE_FLY);
-	entity_set_int(ent, EV_INT_solid, SOLID_TRIGGER);
+  entity_set_float(ent, EV_FL_frame, 255.0);
+  entity_set_int(ent, EV_INT_sequence, seq);
+  entity_set_vector(ent, EV_VEC_angles, angle);
+  entity_set_int(ent, EV_INT_movetype, MOVETYPE_FLY);
+  entity_set_int(ent, EV_INT_solid, SOLID_TRIGGER);
 
-	entity_set_int(ent, EV_INT_skin, get_player_data(id, PD_SKIN));
-	entity_set_int(ent, EV_INT_iuser1, id);
+  entity_set_int(ent, EV_INT_skin, get_player_data(id, PD_SKIN));
+  entity_set_int(ent, EV_INT_iuser1, id);
 }
 
 //MYFUNC
 get_game_mode()
-	return g_iGameMode;
+  return g_iGameMode;
 
 set_game_mode(value)
 {
-	if(value == GAME_RESTARTING)
-		log_amx("[JAIL] Game has restarted :(");
+  if(value == GAME_RESTARTING)
+    log_amx("[JAIL] Game has restarted :(");
 
-	g_iGameMode = value;
-	new ret;
-	ExecuteForward(g_pGameModeForward, ret, value);
+  g_iGameMode = value;
+  new ret;
+  ExecuteForward(g_pGameModeForward, ret, value);
 }
 
 get_player_data(id, pd)
-	return g_iPlayerData[id][pd];
+  return g_iPlayerData[id][pd];
 
 set_player_data(id, pd, value)
 {
-	if(pd == PD_SIMON && get_player_data(id, pd))
-		set_user_simon(id, value, 0);
-	else g_iPlayerData[id][pd] = value;
+  if(pd == PD_SIMON && get_player_data(id, pd))
+    set_user_simon(id, value, 0);
+  else g_iPlayerData[id][pd] = value;
 }
 
 get_global_info(gi)
-	return g_iGlobalInfo[gi];
+  return g_iGlobalInfo[gi];
 
 set_global_info(gi, value)
-	g_iGlobalInfo[gi] = value;
+  g_iGlobalInfo[gi] = value;
 
 Float:get_roundtime()
-	return get_gametime() - g_fRoundStart - g_fFreezeTime;
+  return get_gametime() - g_fRoundStart - g_fFreezeTime;
 
 set_user_simon(id, value, killer=0, print=0)
 {
-	set_global_info(GI_SIMON, value ? id : 0);
-	g_iPlayerData[id][PD_SIMON] = value;
-	if(is_user_connected(killer))
-	{
-		g_iPlayerData[killer][PD_KILLEDSIMON] = id;
-		set_global_info(GI_KILLEDSIMON, killer);
-	}
+  set_global_info(GI_SIMON, value ? id : 0);
+  g_iPlayerData[id][PD_SIMON] = value;
+  if(is_user_connected(killer))
+  {
+    g_iPlayerData[killer][PD_KILLEDSIMON] = id;
+    set_global_info(GI_KILLEDSIMON, killer);
+  }
 
-	if(print)
-	{
-		static name[32];
-		get_user_name(id, name, charsmax(name));
-		ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, value ? "JAIL_SIMON_YES" : "JAIL_SIMON_NO", name);
-	}
+  if(print)
+  {
+    static name[32];
+    get_user_name(id, name, charsmax(name));
+    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, value ? "JAIL_SIMON_YES" : "JAIL_SIMON_NO", name);
+  }
 }
 
 reset_user_all()
 {
-	new num, id;
-	static players[32];
-	get_players(players, num);
+  new num, id;
+  static players[32];
+  get_players(players, num);
 
-	for(--num; num >= 0; num--)
-	{
-		id = players[num];
-		reset_user_one(id);
-	}
+  for(--num; num >= 0; num--)
+  {
+    id = players[num];
+    reset_user_one(id);
+  }
 }
 
 reset_user_one(id)
 {
-	new i;
-	for(i = 0; i < PLAYERDATA; i++)
-	{
-		if(i == PD_NEXTFD) continue;
-		set_player_data(id, i, 0);
-		g_iHideBody[id] = false;
-	}
+  new i;
+  for(i = 0; i < PLAYERDATA; i++)
+  {
+    if(i == PD_NEXTFD || i == PD_TALK_FOREVER) continue;
+    if(i == PD_TALK && get_player_data(id, PD_TALK_FOREVER)) continue;
+    set_player_data(id, i, 0);
+    g_iHideBody[id] = false;
+  }
 
-	if(task_exists(id))
-		remove_task(id);
+  if(task_exists(id))
+    remove_task(id);
 }
 
 reset_global_info()
 {
-	remove_my_tasks(1, 1);
-	remove_entity_name("dead_body");
+  remove_my_tasks(1, 1);
+  remove_entity_name("dead_body");
 
-	new i;
-	for(i = 0; i < GLOBALINFO; i++)
-	{
-		if(i == GI_DAYCOUNT) continue;
-		set_global_info(i, 0);
-	}
+  new i;
+  for(i = 0; i < GLOBALINFO; i++)
+  {
+    if(i == GI_DAYCOUNT) continue;
+    set_global_info(i, 0);
+  }
 }
 
 remove_my_tasks(v1, v2)
 {
-	if(v1)
-	{
-		if(task_exists(TASK_GIVERANDOM+get_pcvar_num(cvar_pick_what)))
-			remove_task(TASK_GIVERANDOM+get_pcvar_num(cvar_pick_what));
-	}
+  if(v1)
+  {
+    if(task_exists(TASK_GIVERANDOM+get_pcvar_num(cvar_pick_what)))
+      remove_task(TASK_GIVERANDOM+get_pcvar_num(cvar_pick_what));
+  }
 
-	if(v2)
-	{
-		if(task_exists(TASK_ROUNDTIME))
-			remove_task(TASK_ROUNDTIME);
-	}
+  if(v2)
+  {
+    if(task_exists(TASK_ROUNDTIME))
+      remove_task(TASK_ROUNDTIME);
+  }
 }
 
 xs_vec_copy(const Float:vecIn[], Float:vecOut[])
 {
-	vecOut[0] = vecIn[0];
-	vecOut[1] = vecIn[1];
-	vecOut[2] = vecIn[2];
+  vecOut[0] = vecIn[0];
+  vecOut[1] = vecIn[1];
+  vecOut[2] = vecIn[2];
 }
 
 get_t_attack_ct(attacker, victim)
 {
-	if(cs_get_user_team(attacker) == CS_TEAM_T && cs_get_user_team(victim) == CS_TEAM_CT)
-		return 1;
+  if(cs_get_user_team(attacker) == CS_TEAM_T && cs_get_user_team(victim) == CS_TEAM_CT)
+    return 1;
 
-	return 0;
+  return 0;
 }
 
 //API
 public _get_playerdata(plugin, params)
 {
-	if(params != 2)
-		return -1;
+  if(params != 2)
+    return -1;
 
-	new id = get_param(1);
-	new pd = get_param(2);
+  new id = get_param(1);
+  new pd = get_param(2);
 
-	return get_player_data(id, pd);
+  return get_player_data(id, pd);
 }
 
 public _set_playerdata(plugin, params)
 {
-	if(params != 3)
-		return -1;
+  if(params != 3)
+    return -1;
 
-	new id = get_param(1);
-	new pd = get_param(2);
-	new value = get_param(3);
-	set_player_data(id, pd, value);
+  new id = get_param(1);
+  new pd = get_param(2);
+  new value = get_param(3);
+  set_player_data(id, pd, value);
 
-	return 1;
+  return 1;
 }
 
 public _get_globalinfo(plugin, params)
 {
-	if(params != 1)
-		return -1;
+  if(params != 1)
+    return -1;
 
-	new gi = get_param(1);
-	return get_global_info(gi);
+  new gi = get_param(1);
+  return get_global_info(gi);
 }
 
 public _set_globalinfo(plugin, params)
 {
-	if(params != 2)
-		return -1;
+  if(params != 2)
+    return -1;
 
-	new gi = get_param(1);
-	new value = get_param(2);
-	set_global_info(gi, value);
+  new gi = get_param(1);
+  new value = get_param(2);
+  set_global_info(gi, value);
 
-	return 1;
+  return 1;
 }
 
 public _get_gamemode()
-	return get_game_mode();
+  return get_game_mode();
 
 public _set_gamemode(plugin, params)
 {
-	if(params != 1)
-		return -1;
+  if(params != 1)
+    return -1;
 
-	new value = get_param(1);
-	set_game_mode(value);
-	return value;
+  new value = get_param(1);
+  set_game_mode(value);
+  return value;
 }
 
 public Float:_get_roundtime()
-	return get_roundtime();
+  return get_roundtime();
 
 
 public _player_crowbar(plugin, params)
 {
-	if(params != 2)
-		return -1;
+  if(params != 2)
+    return -1;
 
-	new id = get_param(1);
-	new value = get_param(2);
+  new id = get_param(1);
+  new value = get_param(2);
 
-	set_player_data(id, PD_CROWBAR, value);
-	if(get_user_weapon(id) == CSW_KNIFE && !is_user_bot(id) && is_user_alive(id))
-		ExecuteHamB(Ham_Item_Deploy, find_ent_by_owner(-1, "weapon_knife", id));
+  set_player_data(id, PD_CROWBAR, value);
+  if(get_user_weapon(id) == CSW_KNIFE && !is_user_bot(id) && is_user_alive(id))
+    ExecuteHamB(Ham_Item_Deploy, find_ent_by_owner(-1, "weapon_knife", id));
 
-	return value;
+  return value;
 }
