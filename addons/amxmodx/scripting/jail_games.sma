@@ -163,12 +163,13 @@ public jail_gamesmenu_handle(id, menu, item)
   ArrayGetArray(g_aGames, gameID, data);
 
   new ret;
-  if(!in_progress(0, GI_GAME))
+  if(in_progress_current(GI_GAME, gameID))
+    ExecuteForward(g_pGameForwardEnd, ret, id, gameID, data[GAME_NAME]);
+  else if(!in_progress(0, GI_GAME))
   {
     ExecuteForward(g_pGameForwardStart, ret, id, gameID, data[GAME_NAME]);
     if(ret) jail_ask_freebie(gameID, GI_GAME);
   }
-  else ExecuteForward(g_pGameForwardEnd, ret, id, gameID, data[GAME_NAME]);
 
   return PLUGIN_HANDLED;
 }

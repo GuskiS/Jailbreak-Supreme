@@ -242,9 +242,9 @@ stock is_jail_admin(id)
   return 0;
 }
 
-stock in_progress_any(id)
+stock in_progress_current(type, value)
 {
-  return in_progress(id, GI_DAY) || in_progress(id, GI_GAME)
+  return jail_get_globalinfo(type) == value;
 }
 
 stock in_progress(id, value)

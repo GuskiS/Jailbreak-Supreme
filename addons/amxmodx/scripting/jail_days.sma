@@ -111,7 +111,7 @@ public jail_chat_show(id)
 
 public jail_daysmenu_show(id)
 {
-  if(!is_user_alive(id) || !simon_or_admin(id) || in_progress_any(id))
+  if(!is_user_alive(id) || !simon_or_admin(id) || in_progress(id, GI_GAME))
     return PLUGIN_HANDLED;
 
   if(!g_iTotalDays)
@@ -164,13 +164,14 @@ public jail_daysmenu_handle(id, menu, item)
   ArrayGetArray(g_aDays, dayID, data);
 
   new ret;
-  if(!in_progress(0, GI_DAY))
+  if(in_progress_current(GI_DAY, dayID))
+    ExecuteForward(g_pDayForwardEnd, ret, id, dayID, data[DAY_NAME]);
+  else if(!in_progress(0, GI_DAY))
   {
     // jail_game_forceend(jail_get_globalinfo(GI_GAME));
     ExecuteForward(g_pDayForwardStart, ret, id, dayID, data[DAY_NAME]);
     if(ret) jail_ask_freebie(dayID, GI_DAY);
   }
-  else ExecuteForward(g_pDayForwardEnd, ret, id, dayID, data[DAY_NAME]);
 
   return PLUGIN_HANDLED;
 }
