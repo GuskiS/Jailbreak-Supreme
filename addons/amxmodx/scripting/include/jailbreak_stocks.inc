@@ -365,3 +365,24 @@ stock move_grenade()
 
   return 1;
 }
+
+stock show_player_menu(id, pick, status, handle[])
+{
+  static name[32], data[3], newmenu;
+  formatex(name, charsmax(name), "%L", id, "JAIL_MENUMENU");
+  newmenu = menu_create(name, handle);
+  static players[32];
+  new inum, i;
+  get_players(players, inum, status, pick ? "TERRORIST" : "CT");
+
+  for(--inum; inum >= 0; inum--)
+  {
+    i = players[inum];
+    if(jail_get_playerdata(i, PD_FREEDAY)) continue;
+    get_user_name(i, name, charsmax(name));
+    num_to_str(i, data, charsmax(data));
+    menu_additem(newmenu, name, data, 0);
+  }
+
+  menu_display(id, newmenu);
+}

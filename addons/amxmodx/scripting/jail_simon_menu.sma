@@ -6,6 +6,27 @@
 #include <jailbreak>
 
 new g_iPlayerVoice[33];
+enum MENU_SIMON
+{
+  MENU_TRANSFER,
+  MENU_GIVEMIC,
+  MENU_DAYS,
+  MENU_GAMES,
+  MENU_ALLOWNADES,
+  MENU_REVERSE,
+  MENU_BLIND
+}
+
+const g_szMenuNames[][] =
+{
+  "JAIL_TRANSFER",
+  "JAIL_GIVEMIC",
+  "JAIL_DAYMENU",
+  "JAIL_ALLOWNADES",
+  "JAIL_GAMEMENU",
+  "JAIL_REVERSE",
+  "JAIL_BLIND"
+};
 
 public plugin_init()
 {
@@ -15,38 +36,44 @@ public plugin_init()
   set_client_commands("transfer", "transfer_show_menu");
   set_client_commands("reverse", "reverse_gameplay");
   set_client_commands("mic", "give_mic");
+  set_client_commands("blind", "blind_show_menu");
+}
+
+public jail_gamemode(mode)
+{
+  if(mode == GAME_STARTED)
+  {
+    new num, id;
+    static players[32];
+    get_players(players, num);
+
+    for(--num; num >= 0; num--)
+    {
+      id = players[num];
+      g_iBlindState[id] = 0;
+    }
+  }
 }
 
 public cmd_show_menu(id)
 {
   if(is_user_alive(id) && my_check(id))
   {
-    static menu, option[64];
+    static menu, option[64], num[3];
     formatex(option, charsmax(option), "%L", id, "JAIL_MENUMENU");
     menu = menu_create(option, "show_menu_handle");
 
-    formatex(option, charsmax(option), "%L", id, "JAIL_TRANSFER");
-    menu_additem(menu, option, "1", 0);
-    formatex(option, charsmax(option), "%L", id, "JAIL_GIVEMIC");
-    menu_additem(menu, option, "2", 0);
-    formatex(option, charsmax(option), "%L", id, "JAIL_DAYMENU");
-    menu_additem(menu, option, "3", 0);
-    formatex(option, charsmax(option), "%L", id, "JAIL_GAMEMENU");
-    menu_additem(menu, option, "4", 0);
-    if(!get_pcvar_num(get_cvar_pointer("jail_prisoner_grenade")))
-    {
-      formatex(option, charsmax(option), "%L", id, "JAIL_ALLOWNADES");
-      menu_additem(menu, option, "5", 0);
-    }
-    formatex(option, charsmax(option), "%L", id, "JAIL_REVERSE", id, jail_get_globalinfo(GI_REVERSE) ? "JAIL_PRISONERS" : "JAIL_GUARDS");
-    menu_additem(menu, option, "6", 0);
-    if(is_jail_admin(id))
-    {
-      formatex(option, charsmax(option), "%L", id, "BALL_BALLMENU");
-      menu_additem(menu, option, "7", 0);
+    new cvar = get_pcvar_num(get_cvar_pointer("jail_prisoner_grenade");
 
-      formatex(option, charsmax(option), "%L", id, "JAIL_REVIVE");
-      menu_additem(menu, option, "8", 0);
+    for(new i = 0; i < MENU_SIMON; i++)
+    {
+      if(i == MENU_ALLOWNADES && cvar) continue;
+
+      formatex(num, charsmax(num), "%d", i);
+      if(i == MENU_REVERSE)
+        formatex(option, charsmax(option), "%L", id, g_szMenuNames[i], id, jail_get_globalinfo(GI_REVERSE) ? "JAIL_PRISONERS" : "JAIL_GUARDS");
+      else formatex(option, charsmax(option), "%L", id, g_szMenuNames[i]);
+      menu_additem(menu, option, num, 0);
     }
 
     menu_display(id, menu);
@@ -68,14 +95,13 @@ public show_menu_handle(id, menu, item)
   new pick = str_to_num(num);
   switch(pick)
   {
-    case 1:	transfer_show_menu(id);
-    case 2: give_mic(id);
-    case 3: client_cmd(id, "jail_days");
-    case 4: client_cmd(id, "jail_games");
-    case 5: nades_show_menu(id);
-    case 6:	reverse_gameplay(id);
-    case 7:	client_cmd(id, "jail_ball");
-    case 8:	revive_show_menu(id);
+    case MENU_TRANSFER:	transfer_show_menu(id);
+    case MENU_GIVEMIC: give_mic(id);
+    case MENU_DAYS: client_cmd(id, "jail_days");
+    case MENU_GAMES: client_cmd(id, "jail_games");
+    case MENU_ALLOWNADES: nades_show_menu(id);
+    case MENU_REVERSE: reverse_gameplay(id);
+    case MENU_BLIND: blind_show_menu(id);
   }
 
   return PLUGIN_HANDLED;
@@ -95,6 +121,11 @@ public reverse_gameplay(id)
   ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVERSE_C", name, LANG_SERVER, jail_get_globalinfo(GI_REVERSE) ? "JAIL_PRISONERS" : "JAIL_GUARDS");
 }
 
+public blind_show_menu(id)
+{
+  show_player_menu(id, 1, "ae", "blind_show_menu_handle");
+}
+
 public transfer_show_menu(id)
 {
   static menu, option[64];
@@ -107,14 +138,6 @@ public transfer_show_menu(id)
   menu_additem(menu, option, "1", 0);
 
   menu_display(id, menu);
-}
-
-public revive_show_menu(id)
-{
-  if(is_jail_admin(id))
-  {
-    show_player_menu(id, 1, "be", "revive_show_menu_handle");
-  }
 }
 
 public nades_show_menu(id)
@@ -134,9 +157,9 @@ public nades_show_menu(id)
   }
 }
 
-public revive_show_menu_handle(id, menu, item)
+public blind_show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id) || !is_jail_admin(id))
+  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
   {
     menu_destroy(menu);
     return PLUGIN_HANDLED;
@@ -147,16 +170,12 @@ public revive_show_menu_handle(id, menu, item)
   menu_destroy(menu);
 
   new userid = str_to_num(num);
+  set_user_blind(userid, !g_iBlindState[userid]);
+
   static name[2][32];
   get_user_name(id, name[0], charsmax(name[]));
   get_user_name(userid, name[1], charsmax(name[]));
-
-  if(!is_user_alive(userid))
-  {
-    ExecuteHamB(Ham_CS_RoundRespawn, id);
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVIVE_C", name[0], name[1]);
-  }
-  else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVIVE_CA", name[1]);
+  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_BLIND_C", name[0], name[1]);
 
   return PLUGIN_HANDLED;
 }
@@ -357,4 +376,22 @@ my_check(id)
     return 1;
 
   return 0;
+}
+
+set_user_blind(id, type)
+{
+  g_iBlindState[id] = type;
+  if(type)
+    type = 0x0004;
+  else type = 0x0000;
+
+  message_begin(MSG_ONE_UNRELIABLE, g_pMsgScreeFade, _, id);
+  write_short(1 * 1<<12);
+  write_short(4*1<<12);
+  write_short(0x0000);
+  write_byte(0);
+  write_byte(0);
+  write_byte(0);
+  write_byte(255);
+  message_end();
 }
