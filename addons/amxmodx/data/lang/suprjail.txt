@@ -39,6 +39,9 @@ JAIL_ALLOWNADES_C = ^3%s^1 has changed nade pickup for player ^3%s^1!
 JAIL_ALLOWNADES_CA = ^3%s^1 has changed nade pickup for all players!
 JAIL_REVERSE = Games/days for: %L
 JAIL_REVERSE_C = ^3%s^1 changed game/day playing! Now for ^3%L^1!
+JAIL_REVIVE = Revive player
+JAIL_REVIVE_C = ^3%s^1 revived ^3%s^1!
+JAIL_REVIVE_CA = ^3%s^1 is already alive!
 
 JAIL_GAMEMENU = Game menu
 JAIL_GAME0 = Box

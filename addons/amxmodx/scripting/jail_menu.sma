@@ -44,6 +44,9 @@ public cmd_show_menu(id)
     {
       formatex(option, charsmax(option), "%L", id, "BALL_BALLMENU");
       menu_additem(menu, option, "7", 0);
+
+      formatex(option, charsmax(option), "%L", id, "JAIL_REVIVE");
+      menu_additem(menu, option, "8", 0);
     }
 
     menu_display(id, menu);
@@ -72,6 +75,7 @@ public show_menu_handle(id, menu, item)
     case 5: nades_show_menu(id);
     case 6:	reverse_gameplay(id);
     case 7:	client_cmd(id, "jail_ball");
+    case 8:	revive_show_menu(id);
   }
 
   return PLUGIN_HANDLED;
@@ -79,7 +83,7 @@ public show_menu_handle(id, menu, item)
 
 public give_mic(id)
 {
-  show_player_menu(id, 1, "MIC_transfer_show_menu_handle");
+  show_player_menu(id, 1, "ae", "MIC_transfer_show_menu_handle");
 }
 
 public reverse_gameplay(id)
@@ -105,6 +109,14 @@ public transfer_show_menu(id)
   menu_display(id, menu);
 }
 
+public revive_show_menu(id)
+{
+  if(is_jail_admin(id))
+  {
+    show_player_menu(id, 1, "be", "revive_show_menu_handle");
+  }
+}
+
 public nades_show_menu(id)
 {
   if(is_user_alive(id))
@@ -122,6 +134,33 @@ public nades_show_menu(id)
   }
 }
 
+public revive_show_menu_handle(id, menu, item)
+{
+  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id) || !is_jail_admin(id))
+  {
+    menu_destroy(menu);
+    return PLUGIN_HANDLED;
+  }
+
+  new access, callback, num[3];
+  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
+  menu_destroy(menu);
+
+  new userid = str_to_num(num);
+  static name[2][32];
+  get_user_name(id, name[0], charsmax(name[]));
+  get_user_name(userid, name[1], charsmax(name[]));
+
+  if(!is_user_alive(userid))
+  {
+    ExecuteHamB(Ham_CS_RoundRespawn, id);
+    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVIVE_C", name[0], name[1]);
+  }
+  else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVIVE_CA", name[1]);
+
+  return PLUGIN_HANDLED;
+}
+
 public transfer_show_menu_handle(id, menu, item)
 {
   if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
@@ -135,7 +174,7 @@ public transfer_show_menu_handle(id, menu, item)
   menu_destroy(menu);
 
   new pick = str_to_num(num);
-  show_player_menu(id, pick, "TR_transfer_show_menu_handle");
+  show_player_menu(id, pick, "ae", "TR_transfer_show_menu_handle");
 
   return PLUGIN_HANDLED;
 }
@@ -168,19 +207,19 @@ public nades_show_menu_handle(id, menu, item)
     get_user_name(id, name, charsmax(name));
     ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_ALLOWNADES_CA", name);
   }
-  else show_player_menu(id, pick, "DO_nades_show_menu_handle");
+  else show_player_menu(id, pick, "ae", "DO_nades_show_menu_handle");
 
   return PLUGIN_HANDLED;
 }
 
-public show_player_menu(id, pick, handle[])
+public show_player_menu(id, pick, status, handle[])
 {
   static name[32], data[3], newmenu;
   formatex(name, charsmax(name), "%L", id, "JAIL_MENUMENU");
   newmenu = menu_create(name, handle);
   static players[32];
   new inum, i;
-  get_players(players, inum, "ae", pick ? "TERRORIST" : "CT");
+  get_players(players, inum, status, pick ? "TERRORIST" : "CT");
 
   for(--inum; inum >= 0; inum--)
   {
