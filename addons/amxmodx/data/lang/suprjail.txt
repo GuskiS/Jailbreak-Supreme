@@ -44,6 +44,8 @@ JAIL_REVIVE_C = ^3%s^1 revived ^3%s^1!
 JAIL_REVIVE_CA = ^3%s^1 is already alive!
 JAIL_BLIND = Blind menu
 JAIL_BLIND_C = ^3%s^1 changed blind state for ^3%s^1!
+JAIL_CHANGESKIN = Skin menu
+JAIL_CHANGESKIN_C = ^3%s^1 changed skin for ^3%s^1!
 
 JAIL_GAMEMENU = Game menu
 JAIL_GAME0 = Box

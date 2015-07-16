@@ -198,17 +198,3 @@ public Ham_Grenade_Deploy_post(ent)
 
 get_weapon_owner(ent)
   return get_pdata_cbase(ent, m_pPlayer, LINUX_WEAPON_OFF);
-
-set_player_model(id, model[], skin)
-{
-  static oldModel[20];
-  cs_get_user_model(id, oldModel, charsmax(oldModel));
-  if(!equal(oldModel, model))
-  {
-    cs_reset_user_model(id);
-    cs_set_user_model(id, model);
-  }
-
-  entity_set_int(id, EV_INT_skin, skin);
-  jail_set_playerdata(id, PD_SKIN, skin);
-}

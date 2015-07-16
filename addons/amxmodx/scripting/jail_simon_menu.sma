@@ -5,7 +5,8 @@
 #include <cs_teams_api>
 #include <jailbreak>
 
-new g_iPlayerVoice[33];
+new g_iPlayerPick[33];
+new g_iBlindState[33];
 enum MENU_SIMON
 {
   MENU_TRANSFER,
@@ -51,6 +52,7 @@ public jail_gamemode(mode)
     {
       id = players[num];
       g_iBlindState[id] = 0;
+      g_iPlayerPick[id] = 0;
     }
   }
 }
@@ -124,6 +126,11 @@ public blind_show_menu(id)
   show_player_menu(id, 1, "ae", "blind_show_menu_handle");
 }
 
+public skin_show_menu(id)
+{
+  show_player_menu(id, 1, "ae", "skin_show_menu_handle");
+}
+
 public transfer_show_menu(id)
 {
   new menu = my_menu_create("JAIL_MENUMENU", "transfer_show_menu_handle");
@@ -151,11 +158,11 @@ public nades_show_menu(id)
   }
 }
 
-public show_duration_menu(id, pick)
+public duration_show_menu(id, pick)
 {
-  new menu = my_menu_create("JAIL_MENUMENU", "show_duration_menu_handle");
+  new menu = my_menu_create("JAIL_MENUMENU", "duration_show_menu_handle");
 
-  g_iPlayerVoice[id] = pick;
+  g_iPlayerPick[id] = pick;
   menu_additem(menu, "For this round", "1", 0);
   menu_additem(menu, "For ever", "2", 0);
 
@@ -264,22 +271,63 @@ public MIC_transfer_show_menu_handle(id, menu, item)
 
   if(jail_get_playerdata(pick, PD_TALK))
     print_voice_change(id, pick);
-  else show_duration_menu(id, pick);
+  else duration_show_menu(id, pick);
   return PLUGIN_HANDLED;
 }
 
-public show_duration_menu_handle(id, menu, item)
+public duration_show_menu_handle(id, menu, item)
 {
   new pick = my_menu_item(id, item, menu);
   if(pick == -1)
     return PLUGIN_HANDLED;
 
-  print_voice_change(id, g_iPlayerVoice[id]);
+  print_voice_change(id, g_iPlayerPick[id]);
   if(pick == 2)
-    jail_set_playerdata(g_iPlayerVoice[id], PD_TALK_FOREVER, true);
+    jail_set_playerdata(g_iPlayerPick[id], PD_TALK_FOREVER, true);
 
-  g_iPlayerVoice[id] = 0;
+  g_iPlayerPick[id] = 0;
+  return PLUGIN_HANDLED;
 }
+
+public skin_show_menu_handle(id, menu, item)
+{
+  new user_id = my_menu_item(id, item, menu);
+  if(user_id == -1)
+    return PLUGIN_HANDLED;
+
+  g_iPlayerPick[id] = my_menu_create("JAIL_MENUMENU", "PL_skin_show_menu_handle");
+
+  formatex(option, charsmax(option), "%d", PS_GREEN);
+  menu_additem(menu, "Green", option, 0);
+  formatex(option, charsmax(option), "%d", PS_RED);
+  menu_additem(menu, "Red", option, 0);
+  formatex(option, charsmax(option), "%d", PS_BLUE);
+  menu_additem(menu, "Blue", option, 0);
+  formatex(option, charsmax(option), "%d", PS_PURPLE);
+  menu_additem(menu, "Purple", option, 0);
+  formatex(option, charsmax(option), "%d", PS_ORANGE);
+  menu_additem(menu, "Orange", option, 0);
+
+  menu_display(id, menu);
+  return PLUGIN_HANDLED;
+}
+
+public PL_skin_show_menu_handle(id, menu, item)
+{
+  new pick = my_menu_item(id, item, menu);
+  if(pick == -1)
+    return PLUGIN_HANDLED;
+
+  static name[2][32];
+  set_player_model(g_iPlayerPick[id], JAIL_T_MODEL, pick);
+  get_user_name(g_iPlayerPick[id], name[0], charsmax(name[]));
+  get_user_name(id, name[1], charsmax(name[]));
+  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_CHANGESKIN_C", name[1], name[0]);
+  g_iPlayerPick[id] = 0;
+  return PLUGIN_HANDLED;
+}
+
+///////////////////
 
 stock print_voice_change(id, pick)
 {
@@ -309,7 +357,7 @@ stock set_user_blind(id, type)
   message_begin(MSG_ONE_UNRELIABLE, g_pMsgScreeFade, _, id);
   write_short(1 * 1<<12);
   write_short(4*1<<12);
-  write_short(0x0000);
+  write_short(type);
   write_byte(0);
   write_byte(0);
   write_byte(0);

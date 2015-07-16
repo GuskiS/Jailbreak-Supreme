@@ -14,6 +14,20 @@ stock is_jailmap()
   return 0;
 }
 
+stock set_player_model(id, model[], skin)
+{
+  static oldModel[20];
+  cs_get_user_model(id, oldModel, charsmax(oldModel));
+  if(!equal(oldModel, model))
+  {
+    cs_reset_user_model(id);
+    cs_set_user_model(id, model);
+  }
+
+  entity_set_int(id, EV_INT_skin, skin);
+  jail_set_playerdata(id, PD_SKIN, skin);
+}
+
 stock auto_exec_config(const szName[], bool:bAutoCreate=true)
 {
   new szFileName[32];
