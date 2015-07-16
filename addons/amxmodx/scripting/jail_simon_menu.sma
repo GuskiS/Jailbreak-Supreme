@@ -59,10 +59,8 @@ public cmd_show_menu(id)
 {
   if(is_user_alive(id) && my_check(id))
   {
-    static menu, option[64], num[3];
-    formatex(option, charsmax(option), "%L", id, "JAIL_MENUMENU");
-    menu = menu_create(option, "show_menu_handle");
-
+    static option[64], num[3];
+    new menu = my_menu_create("JAIL_MENUMENU", "show_menu_handle");
     new cvar = get_pcvar_num(get_cvar_pointer("jail_prisoner_grenade");
 
     for(new i = 0; i < MENU_SIMON; i++)
@@ -128,9 +126,7 @@ public blind_show_menu(id)
 
 public transfer_show_menu(id)
 {
-  static menu, option[64];
-  formatex(option, charsmax(option), "%L", id, "JAIL_MENUMENU");
-  menu = menu_create(option, "transfer_show_menu_handle");
+  new menu = my_menu_create("JAIL_MENUMENU", "transfer_show_menu_handle");
 
   formatex(option, charsmax(option), "To T");
   menu_additem(menu, option, "0", 0);
@@ -144,9 +140,7 @@ public nades_show_menu(id)
 {
   if(is_user_alive(id))
   {
-    static menu, option[64];
-    formatex(option, charsmax(option), "%L", id, "JAIL_ALLOWNADES");
-    menu = menu_create(option, "nades_show_menu_handle");
+    new menu = my_menu_create("JAIL_ALLOWNADES", "nades_show_menu_handle");
 
     formatex(option, charsmax(option), "All T");
     menu_additem(menu, option, "0", 0);
@@ -157,22 +151,25 @@ public nades_show_menu(id)
   }
 }
 
+public show_duration_menu(id, pick)
+{
+  new menu = my_menu_create("JAIL_MENUMENU", "show_duration_menu_handle");
+
+  g_iPlayerVoice[id] = pick;
+  menu_additem(menu, "For this round", "1", 0);
+  menu_additem(menu, "For ever", "2", 0);
+
+  menu_display(id, menu);
+}
+
 public blind_show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
-  {
-    menu_destroy(menu);
+  new userid = my_menu_item(id, item, menu);
+  if(userid == -1)
     return PLUGIN_HANDLED;
-  }
-
-  new access, callback, num[3];
-  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
-  menu_destroy(menu);
-
-  new userid = str_to_num(num);
-  set_user_blind(userid, !g_iBlindState[userid]);
 
   static name[2][32];
+  set_user_blind(userid, !g_iBlindState[userid]);
   get_user_name(id, name[0], charsmax(name[]));
   get_user_name(userid, name[1], charsmax(name[]));
   ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_BLIND_C", name[0], name[1]);
@@ -182,35 +179,20 @@ public blind_show_menu_handle(id, menu, item)
 
 public transfer_show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
-  {
-    menu_destroy(menu);
+  new pick = my_menu_item(id, item, menu);
+  if(pick == -1)
     return PLUGIN_HANDLED;
-  }
 
-  new access, callback, num[3];
-  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
-  menu_destroy(menu);
-
-  new pick = str_to_num(num);
   show_player_menu(id, pick, "ae", "TR_transfer_show_menu_handle");
-
   return PLUGIN_HANDLED;
 }
 
 public nades_show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
-  {
-    menu_destroy(menu);
+  new pick = my_menu_item(id, item, menu);
+  if(pick == -1)
     return PLUGIN_HANDLED;
-  }
 
-  new access, callback, num[3];
-  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
-  menu_destroy(menu);
-
-  new pick = str_to_num(num);
   if(!pick)
   {
     static players[32], name[32];
@@ -231,40 +213,13 @@ public nades_show_menu_handle(id, menu, item)
   return PLUGIN_HANDLED;
 }
 
-public show_player_menu(id, pick, status, handle[])
-{
-  static name[32], data[3], newmenu;
-  formatex(name, charsmax(name), "%L", id, "JAIL_MENUMENU");
-  newmenu = menu_create(name, handle);
-  static players[32];
-  new inum, i;
-  get_players(players, inum, status, pick ? "TERRORIST" : "CT");
-
-  for(--inum; inum >= 0; inum--)
-  {
-    i = players[inum];
-    if(jail_get_playerdata(i, PD_FREEDAY)) continue;
-    get_user_name(i, name, charsmax(name));
-    num_to_str(i, data, charsmax(data));
-    menu_additem(newmenu, name, data, 0);
-  }
-
-  menu_display(id, newmenu);
-}
-
 public TR_transfer_show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
-  {
-    menu_destroy(menu);
+  new pick = my_menu_item(id, item, menu);
+  if(pick == -1)
     return PLUGIN_HANDLED;
-  }
 
-  new access, callback, num[3];
-  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
-  menu_destroy(menu);
-
-  new pick = str_to_num(num), CsTeams:team = cs_get_user_team(pick);
+  new CsTeams:team = cs_get_user_team(pick);
   static name[2][32];
   get_user_name(pick, name[0], charsmax(name[]));
   get_user_name(id, name[1], charsmax(name[]));
@@ -282,23 +237,15 @@ public TR_transfer_show_menu_handle(id, menu, item)
   strip_weapons(pick);
   ExecuteHamB(Ham_CS_RoundRespawn, pick);
 
-
   return PLUGIN_HANDLED;
 }
 
 public DO_nades_show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
-  {
-    menu_destroy(menu);
+  new pick = my_menu_item(id, item, menu);
+  if(pick == -1)
     return PLUGIN_HANDLED;
-  }
 
-  new access, callback, num[3];
-  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
-  menu_destroy(menu);
-
-  new pick = str_to_num(num);
   static name[2][32];
   get_user_name(pick, name[0], charsmax(name[]));
   get_user_name(id, name[1], charsmax(name[]));
@@ -311,48 +258,22 @@ public DO_nades_show_menu_handle(id, menu, item)
 
 public MIC_transfer_show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
-  {
-    menu_destroy(menu);
+  new pick = my_menu_item(id, item, menu);
+  if(pick == -1)
     return PLUGIN_HANDLED;
-  }
 
-  new access, callback, num[3];
-  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
-  menu_destroy(menu);
-
-  new pick = str_to_num(num);
   if(jail_get_playerdata(pick, PD_TALK))
     print_voice_change(id, pick);
   else show_duration_menu(id, pick);
   return PLUGIN_HANDLED;
 }
 
-public show_duration_menu(id, pick)
-{
-  static name[32], data[3], newmenu;
-  formatex(name, charsmax(name), "%L", id, "JAIL_MENUMENU");
-  newmenu = menu_create(name, "show_duration_menu_handle");
-
-  g_iPlayerVoice[id] = pick;
-  menu_additem(newmenu, "For this round", "1", 0);
-  menu_additem(newmenu, "For ever", "2", 0);
-
-  menu_display(id, newmenu);
-}
-
 public show_duration_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
-  {
-    menu_destroy(menu);
+  new pick = my_menu_item(id, item, menu);
+  if(pick == -1)
     return PLUGIN_HANDLED;
-  }
 
-  new access, callback, num[3];
-  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
-  menu_destroy(menu);
-  new pick = str_to_num(num);
   print_voice_change(id, g_iPlayerVoice[id]);
   if(pick == 2)
     jail_set_playerdata(g_iPlayerVoice[id], PD_TALK_FOREVER, true);
@@ -360,7 +281,7 @@ public show_duration_menu_handle(id, menu, item)
   g_iPlayerVoice[id] = 0;
 }
 
-print_voice_change(id, pick)
+stock print_voice_change(id, pick)
 {
   static name[2][32];
   get_user_name(pick, name[0], charsmax(name[]));
@@ -370,7 +291,7 @@ print_voice_change(id, pick)
   ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GIVEMIC_C", name[1], name[0]);
 }
 
-my_check(id)
+stock my_check(id)
 {
   if(simon_or_admin(id) && !in_progress(id, GI_DAY) && !in_progress(id, GI_GAME))
     return 1;
@@ -378,7 +299,7 @@ my_check(id)
   return 0;
 }
 
-set_user_blind(id, type)
+stock set_user_blind(id, type)
 {
   g_iBlindState[id] = type;
   if(type)
@@ -394,4 +315,44 @@ set_user_blind(id, type)
   write_byte(0);
   write_byte(255);
   message_end();
+}
+
+stock show_player_menu(id, pick, status, handle[])
+{
+  new inum, i, menu = my_menu_create("JAIL_MENUMENU", handle);
+  static players[32], data[3];
+  get_players(players, inum, status, pick ? "TERRORIST" : "CT");
+
+  for(--inum; inum >= 0; inum--)
+  {
+    i = players[inum];
+    if(jail_get_playerdata(i, PD_FREEDAY)) continue;
+    get_user_name(i, name, charsmax(name));
+    num_to_str(i, data, charsmax(data));
+    menu_additem(menu, name, data, 0);
+  }
+
+  menu_display(id, menu);
+}
+
+stock my_menu_create(name[], handle[])
+{
+  static option[64];
+  formatex(option, charsmax(option), "%L", id, name);
+  return menu_create(option, handle);
+}
+
+stock my_menu_item(id, item, menu)
+{
+  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
+  {
+    menu_destroy(menu);
+    return -1;
+  }
+
+  new access, callback, num[3];
+  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
+  menu_destroy(menu);
+
+  return str_to_num(num);
 }
