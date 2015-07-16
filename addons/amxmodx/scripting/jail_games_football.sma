@@ -246,7 +246,7 @@ public ball_menu_handle(id, menu, item)
   {
     case 0: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, load_ball(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_LOAD", id, "BALL_BALL");
     case 1: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, ball_create(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_CREATE", id, "BALL_BALL");
-    case 2: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, remove_ball(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_DELETE", id, "BALL_BALL");
+    case 2: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, remove_ball() ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_DELETE", id, "BALL_BALL");
     case 3: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, save_ball(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_SAVE", id, "BALL_BALL");
   }
   ball_menu_show(id);

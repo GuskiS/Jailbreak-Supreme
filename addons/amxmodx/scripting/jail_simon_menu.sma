@@ -7,6 +7,8 @@
 
 new g_iPlayerPick[33];
 new g_iBlindState[33];
+new g_pMsgScreeFade;
+
 enum MENU_SIMON
 {
   MENU_TRANSFER,
@@ -19,8 +21,7 @@ enum MENU_SIMON
   MENU_SKIN
 }
 
-const g_szMenuNames[][] =
-{
+new const g_szMenuNames[][] = {
   "JAIL_TRANSFER",
   "JAIL_GIVEMIC",
   "JAIL_DAYMENU",
@@ -40,6 +41,8 @@ public plugin_init()
   set_client_commands("reverse", "reverse_gameplay");
   set_client_commands("mic", "give_mic");
   set_client_commands("blind", "blind_show_menu");
+
+  g_pMsgScreeFade = get_user_msgid("ScreenFade");
 }
 
 public jail_gamemode(mode)
@@ -64,15 +67,15 @@ public cmd_show_menu(id)
   if(is_user_alive(id) && my_check(id))
   {
     static option[64], num[3];
-    new menu = my_menu_create("JAIL_MENUMENU", "show_menu_handle");
-    new cvar = get_pcvar_num(get_cvar_pointer("jail_prisoner_grenade");
+    new menu = my_menu_create(id, "JAIL_MENUMENU", "show_menu_handle");
+    new cvar = get_pcvar_num(get_cvar_pointer("jail_prisoner_grenade"));
 
-    for(new i = 0; i < MENU_SIMON; i++)
+    for(new i = 0; i < _:MENU_SIMON; i++)
     {
-      if(i == MENU_ALLOWNADES && cvar) continue;
+      if(i == _:MENU_ALLOWNADES && cvar) continue;
 
       formatex(num, charsmax(num), "%d", i);
-      if(i == MENU_REVERSE)
+      if(i == _:MENU_REVERSE)
         formatex(option, charsmax(option), "%L", id, g_szMenuNames[i], id, jail_get_globalinfo(GI_REVERSE) ? "JAIL_PRISONERS" : "JAIL_GUARDS");
       else formatex(option, charsmax(option), "%L", id, g_szMenuNames[i]);
       menu_additem(menu, option, num, 0);
@@ -131,7 +134,7 @@ public skin_show_menu(id)
 
 public transfer_show_menu(id)
 {
-  new menu = my_menu_create("JAIL_MENUMENU", "transfer_show_menu_handle");
+  new menu = my_menu_create(id, "JAIL_MENUMENU", "transfer_show_menu_handle");
   menu_additem(menu, "To T", "0", 0);
   menu_additem(menu, "To CT", "1", 0);
   menu_display(id, menu);
@@ -141,7 +144,7 @@ public nades_show_menu(id)
 {
   if(is_user_alive(id))
   {
-    new menu = my_menu_create("JAIL_ALLOWNADES", "nades_show_menu_handle");
+    new menu = my_menu_create(id, "JAIL_ALLOWNADES", "nades_show_menu_handle");
     menu_additem(menu, "All T", "0", 0);
     menu_additem(menu, "Specific", "1", 0);
     menu_display(id, menu);
@@ -150,7 +153,7 @@ public nades_show_menu(id)
 
 public duration_show_menu(id, pick)
 {
-  new menu = my_menu_create("JAIL_MENUMENU", "duration_show_menu_handle");
+  new menu = my_menu_create(id, "JAIL_MENUMENU", "duration_show_menu_handle");
 
   g_iPlayerPick[id] = pick;
   menu_additem(menu, "For this round", "1", 0);
@@ -285,8 +288,9 @@ public skin_show_menu_handle(id, menu, item)
   if(user_id == -1)
     return PLUGIN_HANDLED;
 
-  g_iPlayerPick[id] = my_menu_create("JAIL_MENUMENU", "PL_skin_show_menu_handle");
+  g_iPlayerPick[id] = my_menu_create(id, "JAIL_MENUMENU", "PL_skin_show_menu_handle");
 
+  static option[3];
   formatex(option, charsmax(option), "%d", PS_GREEN);
   menu_additem(menu, "Green", option, 0);
   formatex(option, charsmax(option), "%d", PS_RED);
@@ -355,25 +359,7 @@ stock set_user_blind(id, type)
   message_end();
 }
 
-stock show_player_menu(id, pick, status, handle[])
-{
-  new inum, i, menu = my_menu_create("JAIL_MENUMENU", handle);
-  static players[32], data[3];
-  get_players(players, inum, status, pick ? "TERRORIST" : "CT");
-
-  for(--inum; inum >= 0; inum--)
-  {
-    i = players[inum];
-    if(jail_get_playerdata(i, PD_FREEDAY)) continue;
-    get_user_name(i, name, charsmax(name));
-    num_to_str(i, data, charsmax(data));
-    menu_additem(menu, name, data, 0);
-  }
-
-  menu_display(id, menu);
-}
-
-stock my_menu_create(name[], handle[])
+stock my_menu_create(id, name[], handle[])
 {
   static option[64];
   formatex(option, charsmax(option), "%L", id, name);

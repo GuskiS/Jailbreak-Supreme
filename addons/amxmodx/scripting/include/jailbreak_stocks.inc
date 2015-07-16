@@ -380,7 +380,7 @@ stock move_grenade()
   return 1;
 }
 
-stock show_player_menu(id, pick, status, handle[])
+stock show_player_menu(id, pick, status[], handle[])
 {
   static name[32], data[3], newmenu;
   formatex(name, charsmax(name), "%L", id, "JAIL_MENUMENU");
