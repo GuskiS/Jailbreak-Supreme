@@ -58,7 +58,7 @@ new const g_szBallNetMenu[][] =
   "BALL_SAVE"
 };
 
-new const g_szBallStorage[] = "suprjail_ball.ini";
+new const g_szBallStorage[] = "jailbreak_ball.ini";
 
 new g_iPlayerInfo[33][PLAYER_INFO], Float:g_fPlayerNetOrigin[33][2][3];
 new g_iBallInfo[BALL_INFO], Float:g_fBallSpawnOrigin[3], Float:g_fBallOwnerOrigin[3], Float:g_fBallLastTouch;
@@ -99,7 +99,7 @@ public plugin_init()
   formatex(g_szGameName, charsmax(g_szGameName), "%L", LANG_PLAYER, "JAIL_GAME5");
   g_pMyNewGame = jail_game_add(g_szGameName, "football", 1);
 
-  register_dictionary("suprjail_ball.txt");
+  register_dictionary("jailbreak_ball.txt");
 
   new ret;
   amx_load_setting_int(g_szBallStorage, g_szMapName, "ball_exists", ret);

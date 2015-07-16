@@ -5,14 +5,13 @@
 #include <cs_teams_api>
 #include <jailbreak>
 
-enum MENU_ADMIN
+enum _:MENU_ADMIN
 {
   MENU_BALL,
-  MENU_REVERSE
+  MENU_REVIVE
 }
 
-const g_szMenuNames[][] =
-{
+new const g_szMenuNames[][] = {
   "BALL_BALLMENU",
   "JAIL_REVIVE"
 };
@@ -38,15 +37,6 @@ public cmd_show_menu(id)
       formatex(num, charsmax(num), "%d", i);
       formatex(option, charsmax(option), "%L", id, g_szMenuNames[i]);
       menu_additem(menu, option, num, 0);
-    }
-
-    if(is_jail_admin(id))
-    {
-      formatex(option, charsmax(option), "%L", id, "BALL_BALLMENU");
-      menu_additem(menu, option, "7", 0);
-
-      formatex(option, charsmax(option), "%L", id, "JAIL_REVIVE");
-      menu_additem(menu, option, "8", 0);
     }
 
     menu_display(id, menu);
@@ -83,7 +73,7 @@ public revive_show_menu(id)
 
 public revive_show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id) || !is_jail_admin(id))
+  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
   {
     menu_destroy(menu);
     return PLUGIN_HANDLED;
@@ -100,7 +90,7 @@ public revive_show_menu_handle(id, menu, item)
 
   if(!is_user_alive(userid))
   {
-    ExecuteHamB(Ham_CS_RoundRespawn, id);
+    ExecuteHamB(Ham_CS_RoundRespawn, userid);
     client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVIVE_C", name[0], name[1]);
   }
   else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_REVIVE_CA", name[1]);
