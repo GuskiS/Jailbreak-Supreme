@@ -30,9 +30,9 @@ JAIL_EVENTEND = End %s
 JAIL_EVENTALREADY = There is already ^4%s^1 in progress, end it by writing ^3/%s^1.
 
 JAIL_MENUMENU = Menu
-JAIL_TRANSFER = Transfer
+JAIL_TRANSFER = Transfer menu
 JAIL_TRANSFER_C = ^3%s^1 has been transfered to ^3%L^1 team by ^3%s^1!
-JAIL_GIVEMIC = Give speak
+JAIL_GIVEMIC = Microphone menu
 JAIL_GIVEMIC_C = ^3%s^1 has changed talkmode to player ^3%s^1!
 JAIL_ALLOWNADES = Allow nades
 JAIL_ALLOWNADES_C = ^3%s^1 has changed nade pickup for player ^3%s^1!
@@ -46,6 +46,9 @@ JAIL_BLIND = Blind menu
 JAIL_BLIND_C = ^3%s^1 changed blind state for ^3%s^1!
 JAIL_CHANGESKIN = Skin menu
 JAIL_CHANGESKIN_C = ^3%s^1 changed skin for ^3%s^1!
+JAIL_WEAPONS = Weapons menu
+JAIL_WEAPONS_C = ^3%s^1 gave weapon to ^3%s^1!
+JAIL_WEAPONS_CA = ^3%s^1 gave weapon to all players!
 
 JAIL_GAMEMENU = Game menu
 JAIL_GAME0 = Box

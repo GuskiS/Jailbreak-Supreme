@@ -18,7 +18,8 @@ enum _:MENU_SIMON
   MENU_ALLOWNADES,
   MENU_REVERSE,
   MENU_BLIND,
-  MENU_SKIN
+  MENU_SKIN,
+  MENU_WEAPONS
 }
 
 new const g_szMenuNames[][] = {
@@ -29,7 +30,8 @@ new const g_szMenuNames[][] = {
   "JAIL_GAMEMENU",
   "JAIL_REVERSE",
   "JAIL_BLIND",
-  "JAIL_CHANGESKIN"
+  "JAIL_CHANGESKIN",
+  "JAIL_WEAPONS"
 };
 
 public plugin_init()
@@ -39,7 +41,7 @@ public plugin_init()
   set_client_commands("menu", "cmd_show_menu");
   set_client_commands("transfer", "transfer_show_menu");
   set_client_commands("reverse", "reverse_gameplay");
-  set_client_commands("mic", "give_mic");
+  set_client_commands("mic", "mic_show_menu");
   set_client_commands("blind", "blind_show_menu");
   set_client_commands("skin", "skin_show_menu");
 
@@ -95,9 +97,10 @@ public show_menu_handle(id, menu, item)
   switch(pick)
   {
     case MENU_TRANSFER:	transfer_show_menu(id);
-    case MENU_GIVEMIC: give_mic(id);
+    case MENU_GIVEMIC: mic_show_menu(id);
     case MENU_DAYS: client_cmd(id, "jail_days");
     case MENU_GAMES: client_cmd(id, "jail_games");
+    case MENU_WEAPONS: client_cmd(id, "jail_weapons");
     case MENU_ALLOWNADES: nades_show_menu(id);
     case MENU_REVERSE: reverse_gameplay(id);
     case MENU_BLIND: blind_show_menu(id);
@@ -107,7 +110,7 @@ public show_menu_handle(id, menu, item)
   return PLUGIN_HANDLED;
 }
 
-public give_mic(id)
+public mic_show_menu(id)
 {
   show_player_menu(id, 1, "ae", "MIC_transfer_show_menu_handle");
 }
@@ -298,15 +301,15 @@ public skin_show_menu_handle(id, menu, item)
   new newmenu = my_menu_create(id, "JAIL_MENUMENU", "PL_skin_show_menu_handle");
 
   static option[3];
-  formatex(option, charsmax(option), "%d", PS_GREEN);
+  formatex(option, charsmax(option), "%d", SKIN_FREEDAY);
   menu_additem(newmenu, "Green", option, 0);
-  formatex(option, charsmax(option), "%d", PS_RED);
+  formatex(option, charsmax(option), "%d", SKIN_WANTED);
   menu_additem(newmenu, "Red", option, 0);
-  formatex(option, charsmax(option), "%d", PS_BLUE);
+  formatex(option, charsmax(option), "%d", SKIN_RANDOM1);
   menu_additem(newmenu, "Blue", option, 0);
-  formatex(option, charsmax(option), "%d", PS_PURPLE);
+  formatex(option, charsmax(option), "%d", SKIN_RANDOM2);
   menu_additem(newmenu, "Purple", option, 0);
-  formatex(option, charsmax(option), "%d", PS_ORANGE);
+  formatex(option, charsmax(option), "%d", SKIN_RANDOM3);
   menu_additem(newmenu, "Orange", option, 0);
 
   menu_display(id, newmenu);

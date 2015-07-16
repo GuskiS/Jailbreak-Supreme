@@ -40,15 +40,6 @@ stock const g_szKnifeModel[][] = {"models/suprjail/p_crowbar.mdl", "models/suprj
 
 #pragma semicolon 1
 
-enum _:PLAYERSKIN
-{
-  PS_GREEN,
-  PS_RED,
-  PS_BLUE,
-  PS_PURPLE,
-  PS_ORANGE
-}
-
 enum _:PLAYERDATA
 {
   PD_SIMON,

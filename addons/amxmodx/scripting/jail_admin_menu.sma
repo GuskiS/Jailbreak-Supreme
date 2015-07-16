@@ -1,8 +1,6 @@
 #include <amxmodx>
 #include <engine>
-#include <fakemeta>
 #include <hamsandwich>
-#include <cs_teams_api>
 #include <jailbreak>
 
 enum _:MENU_ADMIN
