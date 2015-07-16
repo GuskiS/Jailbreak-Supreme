@@ -116,7 +116,7 @@ public jail_daysmenu_show(id)
 
   if(!g_iTotalDays)
   {
-    ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_NODAYSADDED");
+    client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_NODAYSADDED");
     return PLUGIN_HANDLED;
   }
 

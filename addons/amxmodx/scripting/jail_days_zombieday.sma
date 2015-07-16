@@ -251,7 +251,7 @@ public begin_zombieday()
     }
   }
 
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, "JAIL_DAY10_EXTRA1");
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_DAY10_EXTRA1");
 
   new i;
   get_players(players, num, "a");
@@ -356,7 +356,7 @@ end_zombieday(simon, type = 0)
   {
     static servername[64];
     get_cvar_string("hostname" , servername, charsmax(servername));
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, "JAIL_DAY10_EXTRA3", servername);
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_DAY10_EXTRA3", servername);
     jail_celldoors(simon, TS_CLOSED);
     //jail_set_winner(2);
     final_end_check();
@@ -364,7 +364,7 @@ end_zombieday(simon, type = 0)
   else
   {
     jail_set_winner(1);
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, "JAIL_DAY10_EXTRA2");
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_DAY10_EXTRA2");
   }
 
   set_lights("#OFF");

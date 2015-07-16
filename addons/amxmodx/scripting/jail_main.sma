@@ -98,7 +98,7 @@ public jail_game_start()
 
 public startup_info(id)
 {
-  ColorChat(id, NORMAL, "%s Mod created by %s, skype:guskis1, version: %s!", JAIL_TAG, JAIL_AUTHOR, JAIL_VERSION);
+  client_print_color(0, print_team_default, "%s Mod created by %s, skype:guskis1, version: %s!", JAIL_TAG, JAIL_AUTHOR, JAIL_VERSION);
 }
 
 public Event_RestartRound()
@@ -232,11 +232,11 @@ public set_player_simon(id)
         else
         {
           get_user_name(simon, name, charsmax(name));
-          ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_SIMON_ALREADY", name);
+          client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_SIMON_ALREADY", name);
         }
       }
     }
-    else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_MUSTBECT");
+    else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_MUSTBECT");
   }
 }
 
@@ -409,7 +409,7 @@ set_user_simon(id, value, killer=0, print=0)
   {
     static name[32];
     get_user_name(id, name, charsmax(name));
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, value ? "JAIL_SIMON_YES" : "JAIL_SIMON_NO", name);
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, value ? "JAIL_SIMON_YES" : "JAIL_SIMON_NO", name);
   }
 }
 

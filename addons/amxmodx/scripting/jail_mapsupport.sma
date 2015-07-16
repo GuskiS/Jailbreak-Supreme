@@ -244,9 +244,9 @@ public jail_doors(id)
   static name[32];
   get_user_name(id, name, charsmax(name));
   if(newstate == TS_OPENED)
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_OPENEDCELLS", id ? name : "Server");
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_OPENEDCELLS", id ? name : "Server");
   else if(newstate == TS_CLOSED)
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_CLOSEDCELLS", id ? name : "Server");
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_CLOSEDCELLS", id ? name : "Server");
 }
 
 public on_button(id, button)

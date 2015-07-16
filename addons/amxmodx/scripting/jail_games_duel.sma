@@ -88,7 +88,7 @@ public plugin_init()
   DisableHamForward((g_pHamForwards[2] = RegisterHam(Ham_Item_PostFrame, "weapon_awp", "Ham_Item_PostFrame_pre", 0)));
   DisableHamForward((g_pHamForwards[3] = RegisterHamPlayer(Ham_TakeDamage, "Ham_TakeDamage_pre", 0)));
 
-  formatex(g_szGameName, charsmax(g_szGameName), "%L", LANG_PLAYER, "JAIL_GAME1");
+  formatex(g_szGameName, charsmax(g_szGameName), "%L", LANG_SERVER, "JAIL_GAME1");
   g_pMyNewGame = jail_game_add(g_szGameName, "duel", 1);
   set_client_commands("lr", "menu_lr");
 
@@ -317,7 +317,7 @@ public players_menu_handle(id, menu, item)
       static name[2][32];
       get_user_name(g_iPlayerDueling[0], name[0], charsmax(name[]));
       get_user_name(g_iPlayerDueling[1], name[1], charsmax(name[]));
-      ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, "JAIL_GAME1_EXTRA1", name[0], duel_name(LANG_PLAYER), name[1]);
+      client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME1_EXTRA1", name[0], duel_name(LANG_SERVER), name[1]);
       start_duel(id);
     }
     else players_menu(id, "TERRORIST");
@@ -334,7 +334,7 @@ public players_menu_handle(id, menu, item)
     get_user_name(id, name[0], charsmax(name[]));
     get_user_name(player, name[1], charsmax(name[]));
 
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, "JAIL_GAME1_EXTRA1", name[0], duel_name(LANG_PLAYER), name[1]);
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME1_EXTRA1", name[0], duel_name(LANG_SERVER), name[1]);
     start_duel(id);
   }
 
@@ -357,7 +357,7 @@ public start_duel(id)
     default:
     {
       jail_set_globalinfo(GI_EVENTSTOP, true);
-      server_event(id, duel_name(LANG_PLAYER), 0);
+      server_event(id, duel_name(LANG_SERVER), 0);
       set_cvar_num("mp_friendlyfire", 1);
       jail_set_globalinfo(GI_GAME, g_pMyNewGame);
       jail_set_globalinfo(GI_NOFREEBIES, true);
@@ -401,7 +401,7 @@ public end_duel(id)
     {
       static name[32];
       get_user_name(id, name, charsmax(name));
-      ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, "JAIL_GAME1_EXTRA3", name, LANG_PLAYER, "JAIL_DAY0");
+      client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME1_EXTRA3", name, LANG_SERVER, "JAIL_DAY0");
     }
     default:
     {
@@ -416,12 +416,12 @@ public end_duel(id)
       {
         new ret;
         ExecuteForward(g_pDuelForwardEnd, ret, id, duel-EXTRA_DUEL, AID, BID);
-        ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, "JAIL_GAME1_EXTRA2", name[0], duel_name(LANG_PLAYER), name[1]);
+        client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME1_EXTRA2", name[0], duel_name(LANG_SERVER), name[1]);
         null_everything();
 
         return;
       }
-      else ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_PLAYER, "JAIL_GAME1_EXTRA2", name[0], duel_name(LANG_PLAYER), name[1]);
+      else client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME1_EXTRA2", name[0], duel_name(LANG_SERVER), name[1]);
     }
   }
 
@@ -551,14 +551,14 @@ stock check_lr(val=0)
         menu_duel(id);
         return;
       }
-      else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_GAME1_EXTRA4");
+      else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_GAME1_EXTRA4");
     }
   }
   if(!val)
     g_iMode = 0;
 }
 
-stock duel_name(id = LANG_PLAYER)
+stock duel_name(id = LANG_SERVER)
 {
   new duel = g_iPlayerDueling[DW_TYPE];
   static duelname[JAIL_MENUITEM];

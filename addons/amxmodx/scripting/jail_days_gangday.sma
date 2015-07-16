@@ -86,7 +86,7 @@ start_gangday(simon)
 
   if(num < 4)
   {
-    ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_DAY6_EXTRA1", id, "JAIL_DAY6");
+    client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_DAY6_EXTRA1", id, "JAIL_DAY6");
     return;
   }
 

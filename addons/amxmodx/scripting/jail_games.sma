@@ -115,7 +115,7 @@ public jail_gamesmenu_show(id)
 
   if(!g_iTotalGames)
   {
-    ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_NOGAMESADDED");
+    client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_NOGAMESADDED");
     return PLUGIN_HANDLED;
   }
 

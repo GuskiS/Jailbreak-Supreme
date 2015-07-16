@@ -67,7 +67,7 @@ public cmd_box_on(id)
     set_cvar_num("mp_friendlyfire", 1);
     jail_set_globalinfo(GI_GAME, g_pMyNewGame);
   }
-  else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_GAME0_TOOMUCH", num, get_pcvar_num(cvar_box_players));
+  else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_GAME0_TOOMUCH", num, get_pcvar_num(cvar_box_players));
 
   return PLUGIN_HANDLED;
 }

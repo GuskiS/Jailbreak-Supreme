@@ -101,9 +101,9 @@ public revive_show_menu_handle(id, menu, item)
   if(!is_user_alive(userid))
   {
     ExecuteHamB(Ham_CS_RoundRespawn, id);
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVIVE_C", name[0], name[1]);
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVIVE_C", name[0], name[1]);
   }
-  else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVIVE_CA", name[1]);
+  else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_REVIVE_CA", name[1]);
 
   return PLUGIN_HANDLED;
 }

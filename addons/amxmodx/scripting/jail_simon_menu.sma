@@ -110,11 +110,13 @@ public give_mic(id)
 
 public reverse_gameplay(id)
 {
-  jail_set_globalinfo(GI_REVERSE, !jail_get_globalinfo(GI_REVERSE));
+  new reverse = !jail_get_globalinfo(GI_REVERSE);
+  jail_set_globalinfo(GI_REVERSE, reverse);
   cmd_show_menu(id);
+
   static name[32];
   get_user_name(id, name, charsmax(name));
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVERSE_C", name, LANG_SERVER, jail_get_globalinfo(GI_REVERSE) ? "JAIL_PRISONERS" : "JAIL_GUARDS");
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_REVERSE_C", name, LANG_SERVER, reverse ? "JAIL_PRISONERS" : "JAIL_GUARDS");
 }
 
 public blind_show_menu(id)
@@ -167,7 +169,7 @@ public blind_show_menu_handle(id, menu, item)
   set_user_blind(userid, !g_iBlindState[userid]);
   get_user_name(id, name[0], charsmax(name[]));
   get_user_name(userid, name[1], charsmax(name[]));
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_BLIND_C", name[0], name[1]);
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_BLIND_C", name[0], name[1]);
 
   return PLUGIN_HANDLED;
 }
@@ -201,7 +203,7 @@ public nades_show_menu_handle(id, menu, item)
     }
 
     get_user_name(id, name, charsmax(name));
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_ALLOWNADES_CA", name);
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_ALLOWNADES_CA", name);
   }
   else show_player_menu(id, pick, "ae", "DO_nades_show_menu_handle");
 
@@ -222,12 +224,12 @@ public TR_transfer_show_menu_handle(id, menu, item)
   if(team == CS_TEAM_T)
   {
     cs_set_player_team(pick, CS_TEAM_CT);
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_TRANSFER_C", name[0], LANG_SERVER, "JAIL_GUARDS", name[1]);
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_TRANSFER_C", name[0], LANG_SERVER, "JAIL_GUARDS", name[1]);
   }
   else if(team == CS_TEAM_CT)
   {
     cs_set_player_team(pick, CS_TEAM_T);
-    ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_TRANSFER_C", name[0], LANG_SERVER, "JAIL_PRISONERS", name[1]);
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_TRANSFER_C", name[0], LANG_SERVER, "JAIL_PRISONERS", name[1]);
   }
   strip_weapons(pick);
   ExecuteHamB(Ham_CS_RoundRespawn, pick);
@@ -246,7 +248,7 @@ public DO_nades_show_menu_handle(id, menu, item)
   get_user_name(id, name[1], charsmax(name[]));
 
   jail_set_playerdata(pick, PD_REMOVEHE, !jail_get_playerdata(pick, PD_REMOVEHE));
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_ALLOWNADES_C", name[0], name[1]);
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_ALLOWNADES_C", name[0], name[1]);
 
   return PLUGIN_HANDLED;
 }
@@ -310,7 +312,7 @@ public PL_skin_show_menu_handle(id, menu, item)
   set_player_model(g_iPlayerPick[id], JAIL_T_MODEL, pick);
   get_user_name(g_iPlayerPick[id], name[0], charsmax(name[]));
   get_user_name(id, name[1], charsmax(name[]));
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_CHANGESKIN_C", name[1], name[0]);
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_CHANGESKIN_C", name[1], name[0]);
   g_iPlayerPick[id] = 0;
   return PLUGIN_HANDLED;
 }
@@ -324,7 +326,7 @@ stock print_voice_change(id, pick)
   get_user_name(id, name[1], charsmax(name[]));
   jail_set_playerdata(pick, PD_TALK, !jail_get_playerdata(pick, PD_TALK));
   jail_set_playerdata(pick, PD_TALK_FOREVER, false);
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GIVEMIC_C", name[1], name[0]);
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GIVEMIC_C", name[1], name[0]);
 }
 
 stock my_check(id)

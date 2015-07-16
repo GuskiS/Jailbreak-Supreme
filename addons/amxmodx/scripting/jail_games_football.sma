@@ -172,7 +172,7 @@ public main_menu_show(id)
     {
       static name[32];
       get_user_name(g_iUsingMenu, name, charsmax(name));
-      ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "BALL_USINGMENU", name);
+      client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "BALL_USINGMENU", name);
     }
   }
 
@@ -244,10 +244,10 @@ public ball_menu_handle(id, menu, item)
   new pick = str_to_num(num);
   switch(pick)
   {
-    case 0: ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, load_ball(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_LOAD", id, "BALL_BALL");
-    case 1: ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, ball_create(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_CREATE", id, "BALL_BALL");
-    case 2: ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, remove_ball() ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_DELETE", id, "BALL_BALL");
-    case 3: ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, save_ball(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_SAVE", id, "BALL_BALL");
+    case 0: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, load_ball(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_LOAD", id, "BALL_BALL");
+    case 1: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, ball_create(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_CREATE", id, "BALL_BALL");
+    case 2: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, remove_ball(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_DELETE", id, "BALL_BALL");
+    case 3: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, save_ball(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_SAVE", id, "BALL_BALL");
   }
   ball_menu_show(id);
 
@@ -301,20 +301,20 @@ public nets_menu_handle(id, menu, item)
   new pick = str_to_num(num);
   switch(pick)
   {
-    case 0: ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, load_nets(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_LOAD", id, "BALL_NET");
+    case 0: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, load_nets(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_LOAD", id, "BALL_NET");
     case 1:
     {
       if(g_iNetInfo[NI_COUNT] < MAX_NETS)
       {
         my_emitsound_forward(true);
         g_iPlayerInfo[id][PI_BUILDING] = true;
-        ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "BALL_SETORIGIN1");
+        client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "BALL_SETORIGIN1");
       }
       else
       {
         my_emitsound_forward(false);
         g_iPlayerInfo[id][PI_BUILDING] = false;
-        ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "BALL_MAXNETS", MAX_NETS);
+        client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "BALL_MAXNETS", MAX_NETS);
       }
     }
     case 2:
@@ -329,9 +329,9 @@ public nets_menu_handle(id, menu, item)
         g_iNetInfo[NI_COUNT]--;
       }
 
-      ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, ent ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_DELETE", id, "BALL_NET");
+      client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, ent ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_DELETE", id, "BALL_NET");
     }
-    case 3: ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, save_nets(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_SAVE", id, "BALL_NET");
+    case 3: client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, save_nets(id) ? "BALL_SUCCEED" : "BALL_FAILED", id, "BALL_SAVE", id, "BALL_NET");
   }
   if(task_exists(id+TASK_NETS))
     remove_task(id+TASK_NETS);
@@ -518,7 +518,7 @@ public Forward_EmitSound_pre(id, channel, sample[])
       {
         g_iPlayerInfo[id][PI_BUILDINGSTAGE] = SECOND_POINT;
         g_fPlayerNetOrigin[id][0] = fOrigin;
-        ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "BALL_SETORIGIN2");
+        client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "BALL_SETORIGIN2");
       }
       else
       {
@@ -528,7 +528,7 @@ public Forward_EmitSound_pre(id, channel, sample[])
         g_fPlayerNetOrigin[id][1] = fOrigin;
 
         net_create(g_fPlayerNetOrigin[id][0], fOrigin);
-        ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "BALL_SUCCEED", id, "BALL_CREATE", id, "BALL_NET");
+        client_print_color(id, print_team_default, "%s %L", JAIL_TAG, "BALL_SUCCEED", id, "BALL_CREATE", id, "BALL_NET");
       }
     }
   }
@@ -561,7 +561,7 @@ public load_ball(id)
       static name[32];
       get_user_name(id, name, charsmax(name));
       log_amx("[JAIL] Admin %s loaded ball @ %s", name, g_szMapName);
-      ColorChat(0, NORMAL, "%s Admin %s loaded ball!", JAIL_TAG, name);
+      client_print_color(0, print_team_default, "%s Admin %s loaded ball!", JAIL_TAG, name);
     }
 
     return PLUGIN_HANDLED;
@@ -598,7 +598,7 @@ public load_nets(id)
       static name[32];
       get_user_name(id, name, charsmax(name));
       log_amx("[JAIL] Admin %s loaded 2 nets @ %s", name, g_szMapName);
-      ColorChat(0, NORMAL, "%s Admin %s loaded 2 nets!", JAIL_TAG, name);
+      client_print_color(0, print_team_default, "%s Admin %s loaded 2 nets!", JAIL_TAG, name);
     }
 
     return PLUGIN_HANDLED;
@@ -619,7 +619,7 @@ public save_ball(id)
     static name[32];
     get_user_name(id, name, charsmax(name));
     log_amx("[JAIL] Admin %s saved ball at these coordinates: %0.2f; %0.2f; %0.2f @ %s", name, g_fBallSpawnOrigin[0], g_fBallSpawnOrigin[1], g_fBallSpawnOrigin[2], g_szMapName);
-    ColorChat(0, NORMAL, "%s Admin %s saved ball at these coordinates: %0.2f; %0.2f; %0.2f!", JAIL_TAG, name, g_fBallSpawnOrigin[0], g_fBallSpawnOrigin[1], g_fBallSpawnOrigin[2]);
+    client_print_color(0, print_team_default, "%s Admin %s saved ball at these coordinates: %0.2f; %0.2f; %0.2f!", JAIL_TAG, name, g_fBallSpawnOrigin[0], g_fBallSpawnOrigin[1], g_fBallSpawnOrigin[2]);
     return PLUGIN_HANDLED;
   }
 
@@ -667,7 +667,7 @@ public save_nets(id)
   static name[32];
   get_user_name(id, name, charsmax(name));
   log_amx("[JAIL] Admin %s saved 2 nets @ %s", name, g_szMapName);
-  ColorChat(0, NORMAL, "%s Admin %s saved 2 nets!", JAIL_TAG, name);
+  client_print_color(0, print_team_default, "%s Admin %s saved 2 nets!", JAIL_TAG, name);
 
   return PLUGIN_HANDLED;
 }
@@ -921,7 +921,7 @@ start_football(simon)
 {
   if(!load_all())
   {
-    ColorChat(simon, NORMAL, "%s %L", JAIL_TAG, simon, "BALL_FAILEDSTART");
+    client_print_color(simon, print_team_default, "%s %L", JAIL_TAG, simon, "BALL_FAILEDSTART");
     return PLUGIN_CONTINUE;
   }
 
@@ -1049,7 +1049,7 @@ stock game_active(id = 0)
 {
   if(jail_get_globalinfo(GI_GAME) == g_pMyNewGame)
   {
-    if(id) ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_EVENTALREADY", g_szGameName, "games");
+    if(id) client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_EVENTALREADY", g_szGameName, "games");
     return 1;
   }
 

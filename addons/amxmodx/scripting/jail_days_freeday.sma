@@ -139,7 +139,7 @@ public end_freeday(taskid)
       begin_freeday_one(taskid, jail_get_playerdata(taskid, PD_SKIN), false, false);
       static name[32];
       get_user_name(taskid, name, charsmax(name));
-      ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_DAY0_EXTRA2", g_szDayName, name);
+      client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_DAY0_EXTRA2", g_szDayName, name);
       //jail_set_globalinfo(GI_DAY, 0);
       return PLUGIN_HANDLED;
     }
@@ -173,7 +173,7 @@ public cmd_freeday_menu(id)
       menu_display(id, menu);
     }
   }
-  else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_DAYALREADY");
+  else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_DAYALREADY");
 
   return PLUGIN_HANDLED;
 }
@@ -246,7 +246,7 @@ public cmd_freeday_one_handle(id, menu, item)
   static nameS[32], nameP[32];
   get_user_name(id, nameS, charsmax(nameS));
   get_user_name(player, nameP, charsmax(nameP));
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_DAY0_EXTRA1", nameS, nameP, g_szDayName);
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_DAY0_EXTRA1", nameS, nameP, g_szDayName);
 
   cmd_freeday_one(id);
 
@@ -283,7 +283,7 @@ begin_freeday_one(id, skin, value, print)
     entity_set_int(id, EV_INT_skin, skin);
 
   if(print)
-    ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_DAY0_AWARDED", g_szDayName);
+    client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_DAY0_AWARDED", g_szDayName);
 }
 
 public ask_freebies(event, type)

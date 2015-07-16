@@ -215,7 +215,7 @@ stock simon_or_admin(id)
 {
   if(jail_get_gamemode() != GAME_STARTED)
   {
-    ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_GAMENOTSTARTED");
+    client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_GAMENOTSTARTED");
     return 0;
   }
 
@@ -241,8 +241,8 @@ stock simon_or_admin(id)
   else
   {
     if(can_admin_do())
-      ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_SIMON_ADMIN");
-    else ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_SIMON_MUSTBE");
+      client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_SIMON_ADMIN");
+    else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_SIMON_MUSTBE");
   }
 
   return 0;
@@ -273,7 +273,7 @@ stock in_progress(id, value)
         jail_day_getname(event, name);
       else jail_game_getname(event, name);
 
-      ColorChat(id, NORMAL, "%s %L", JAIL_TAG, id, "JAIL_EVENTALREADY", name, value == GI_DAY ? "days" : "games");
+      client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_EVENTALREADY", name, value == GI_DAY ? "days" : "games");
     }
     return 1;
   }
@@ -285,7 +285,7 @@ stock server_event(id, event[], val)
 {
   static name[32];
   get_user_name(id, name, charsmax(name));
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, val ? "JAIL_EVENTOFF" : "JAIL_EVENTON", event, id ? name : "server");
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, val ? "JAIL_EVENTOFF" : "JAIL_EVENTON", event, id ? name : "server");
   log_amx("[JAIL] %L", LANG_SERVER, val ? "JAIL_EVENTOFF" : "JAIL_EVENTON", event, id ? name : "server");
 }
 

@@ -152,7 +152,7 @@ public give_paint_handler(id, menu, item)
   static name[2][32];
   get_user_name(id, name[0], charsmax(name[]));
   get_user_name(pick, name[1], charsmax(name[]));
-  ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME4_TAKE", name[0], name[1]);
+  client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME4_TAKE", name[0], name[1]);
 
   return PLUGIN_HANDLED;
 }

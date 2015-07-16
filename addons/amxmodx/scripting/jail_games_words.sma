@@ -73,7 +73,7 @@ public pick_the_word(id)
     trim(g_szGamesWord);
     if(equal(g_szGamesWord, ""))
     {
-      ColorChat(id, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME2_ERROR");
+      client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_GAME2_ERROR");
       client_cmd(id, "messagemode jail_my_word");
       return PLUGIN_HANDLED;
     }
@@ -98,7 +98,7 @@ public hook_say(id)
     {
       static name[32];
       get_user_name(id, name, charsmax(name));
-      ColorChat(0, NORMAL, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME2_WON", name, g_szGameName, words);
+      client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME2_WON", name, g_szGameName, words);
       word_game_off(id);
     }
     words[0] = '^0';
