@@ -15,7 +15,8 @@ enum MENU_SIMON
   MENU_GAMES,
   MENU_ALLOWNADES,
   MENU_REVERSE,
-  MENU_BLIND
+  MENU_BLIND,
+  MENU_SKIN
 }
 
 const g_szMenuNames[][] =
@@ -26,7 +27,8 @@ const g_szMenuNames[][] =
   "JAIL_ALLOWNADES",
   "JAIL_GAMEMENU",
   "JAIL_REVERSE",
-  "JAIL_BLIND"
+  "JAIL_BLIND",
+  "JAIL_SKIN"
 };
 
 public plugin_init()
@@ -82,17 +84,10 @@ public cmd_show_menu(id)
 
 public show_menu_handle(id, menu, item)
 {
-  if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
-  {
-    menu_destroy(menu);
+  new pick = my_menu_item(id, item, menu);
+  if(pick == -1)
     return PLUGIN_HANDLED;
-  }
 
-  new access, callback, num[3];
-  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
-  menu_destroy(menu);
-
-  new pick = str_to_num(num);
   switch(pick)
   {
     case MENU_TRANSFER:	transfer_show_menu(id);
@@ -102,6 +97,7 @@ public show_menu_handle(id, menu, item)
     case MENU_ALLOWNADES: nades_show_menu(id);
     case MENU_REVERSE: reverse_gameplay(id);
     case MENU_BLIND: blind_show_menu(id);
+    case MENU_SKIN: blind_show_menu(id);
   }
 
   return PLUGIN_HANDLED;
@@ -134,12 +130,8 @@ public skin_show_menu(id)
 public transfer_show_menu(id)
 {
   new menu = my_menu_create("JAIL_MENUMENU", "transfer_show_menu_handle");
-
-  formatex(option, charsmax(option), "To T");
-  menu_additem(menu, option, "0", 0);
-  formatex(option, charsmax(option), "To CT");
-  menu_additem(menu, option, "1", 0);
-
+  menu_additem(menu, "To T", "0", 0);
+  menu_additem(menu, "To CT", "1", 0);
   menu_display(id, menu);
 }
 
@@ -148,12 +140,8 @@ public nades_show_menu(id)
   if(is_user_alive(id))
   {
     new menu = my_menu_create("JAIL_ALLOWNADES", "nades_show_menu_handle");
-
-    formatex(option, charsmax(option), "All T");
-    menu_additem(menu, option, "0", 0);
-    formatex(option, charsmax(option), "Specific");
-    menu_additem(menu, option, "1", 0);
-
+    menu_additem(menu, "All T", "0", 0);
+    menu_additem(menu, "Specific", "1", 0);
     menu_display(id, menu);
   }
 }
@@ -315,7 +303,7 @@ public skin_show_menu_handle(id, menu, item)
 public PL_skin_show_menu_handle(id, menu, item)
 {
   new pick = my_menu_item(id, item, menu);
-  if(pick == -1)
+  if(pick == -1 || !is_user_alive(g_iPlayerPick[id]))
     return PLUGIN_HANDLED;
 
   static name[2][32];
