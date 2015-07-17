@@ -36,7 +36,7 @@ new const g_szPriAmmo[] =
 
 public plugin_init()
 {
-  register_plugin("[JAIL] Weapon menu", JAIL_VERSION, JAIL_AUTHOR);
+  register_plugin("[JAIL] Weapons menu", JAIL_VERSION, JAIL_AUTHOR);
 
   set_client_commands("weapons", "weapons_show_menu");
 }
