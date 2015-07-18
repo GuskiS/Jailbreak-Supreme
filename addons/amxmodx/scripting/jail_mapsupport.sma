@@ -79,6 +79,11 @@ public plugin_init()
   }
 }
 
+public jail_achivement_load()
+{
+    jail_achiev_register("Open doors", "You must open doors", 10, 1, 1);
+}
+
 public plugin_natives()
 {
   register_library("jailbreak");
@@ -147,6 +152,7 @@ public Ham_Use_pre(ent, id, idactivator, type, Float:value)
 
       if(in_button(ent))
       {
+        jail_achiev_set_progress(id, "Open doors", jail_achiev_get_progress(id, "Open doors") + 1);
         set_task(0.1, "jail_doors", id);
         return HAM_HANDLED;
       }
