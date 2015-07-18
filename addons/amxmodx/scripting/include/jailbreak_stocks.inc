@@ -400,3 +400,17 @@ stock show_player_menu(id, pick, status[], handle[])
 
   menu_display(id, newmenu);
 }
+
+stock escape_mysql(string[], len)
+{
+  replace_all(string, len, "\\", "\\\\");
+  replace_all(string, len, "\0", "\\0");
+  replace_all(string, len, "\n", "\\n");
+  replace_all(string, len, "\r", "\\r");
+  replace_all(string, len, "\x1a", "\Z");
+  replace_all(string, len, "'", "\'");
+  replace_all(string, len, "%", "\%");
+  replace_all(string, len, "#", "\#");
+  replace_all(string, len, ";", "\;");
+  replace_all(string, len, "_", "\_");
+}
