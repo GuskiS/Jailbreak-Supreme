@@ -39,6 +39,13 @@ enum _:DB_ACHIEV_PROGRESS
   PROGRESS_FINISHED_AT
 }
 #define ACHIEVMENT_COUNT 20
+new const g_szColors[][] =
+{
+  "#FF0000",
+  "#FFA200",
+  "#098514"
+};
+
 new g_szPlayerName[33][40], cvar_achievments, cvar_achievments_page;
 new Handle:g_pSqlTuple;
 new g_szAchievments[ACHIEVMENT_COUNT][DB_ACHIEV];
@@ -60,7 +67,7 @@ public plugin_init()
   cvar_achievments_page = register_cvar("jail_achievments_page", "http://heal.lv/achievments.php?server=jail&user_name=%name%");
 
   set_client_commands("played", "cmd_show_playtime");
-  set_client_commands("achievments", "cmd_show_achievments");
+  set_client_commands("progress", "cmd_show_achievments");
 
   g_pAchievmentLoadForward = CreateMultiForward("jail_achivements_load", ET_IGNORE);
   g_pAchievmentProgressForward = CreateMultiForward("jail_achivements_progress", ET_IGNORE, FP_CELL, FP_STRING, FP_CELL, FP_CELL, FP_CELL);
@@ -87,12 +94,13 @@ public cmd_show_achievments(id)
 {
   if(is_user_connected(id) && get_player(id, PLAYER_ID))
   {
-    new link[364], name[64];
-    formatex(name, charsmax(name), "%s&r=%d", g_szPlayerName[id], random_num(1000, 9999));
-
-    copy(link, charsmax(link), g_szHTML);
-    replace(link, charsmax(link), "%name%", name);
-    show_motd(id, link, "Your achievments");
+    // new link[364], name[64];
+    // formatex(name, charsmax(name), "%s&r=%d", g_szPlayerName[id], random_num(1000, 9999));
+    //
+    // copy(link, charsmax(link), g_szHTML);
+    // replace(link, charsmax(link), "%name%", name);
+    // show_motd(id, link, "Your achievments");
+    show_current_progress(id);
   }
 }
 
@@ -652,4 +660,39 @@ stock debug_log(message[], any:...)
   log_amx(new_message);
   #endif
   return message;
+}
+
+stock show_current_progress(id)
+{
+  if(!is_user_connected(id))
+    return;
+
+  const SIZE = 1536;
+  new msg[SIZE+1], len;
+
+  len += formatex(msg[len], SIZE - len, "<html><head><meta charset='utf-8'><style>body{background:#000000 no-repeat center top;color:#FFFFFF}</style></head><body>");
+  len += formatex(msg[len], SIZE - len, "</br><center><h2'>%L</h2></center>", id, "JBA_YOURPROGRESS");
+
+  new current, needed;
+  for(new i = 0; i < ACHIEVMENT_COUNT; i++)
+  {
+    if(!get_achiev(i, ACHIEVMENT_ID)) continue;
+    current = get_progress(id, i, PROGRESS_CURRENT_COUNT);
+    needed = get_achiev(i, ACHIEVMENT_NEEDED_COUNT);
+
+    len += formatex(msg[len], SIZE - len, "%s - %s - <b style='color:%s'>%d / %d</b></br>", g_szAchievments[i][ACHIEVMENT_NAME],  g_szAchievments[i][ACHIEVMENT_DESCRIPTION], get_right_color(current, needed), current, needed);
+  }
+
+  len += formatex(msg[len], SIZE - len, "</body></html>");
+  show_motd(id, msg, "");
+}
+
+stock get_right_color(current, needed)
+{
+  new Float:divided = float(current)/float(needed);
+  if(divided < 0.33)
+    return g_szColors[0];
+  else if(divided < 0.66)
+    return g_szColors[1];
+  else return g_szColors[2];
 }

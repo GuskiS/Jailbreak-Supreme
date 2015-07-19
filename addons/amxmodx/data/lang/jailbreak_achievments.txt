@@ -1,7 +1,8 @@
 [en]
 JBA_PLAYTIME = You have connected ^4%d^1 times and played for ^4%s^1!
-JBA_FINISHED = ^3%s^1 just finished achievment ^4%s^1, congratulations!
+JBA_FINISHED = ^3%s^1 just finished achievement ^4%s^1, congratulations!
 JBA_PROGRESS = You just progressed in achieving ^4%s^1, you have ^4%d^1/^3%d^1!
+JBA_YOURPROGRESS = Your achievement progress
 
 JBA_MANAGECELLS = Manage cells
 JBA_MANAGECELLS_DESC = You must open or close cells
