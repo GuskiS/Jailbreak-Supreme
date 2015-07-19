@@ -66,6 +66,7 @@ public plugin_init()
   g_pAchievmentProgressForward = CreateMultiForward("jail_achivements_progress", ET_IGNORE, FP_CELL, FP_STRING, FP_CELL, FP_CELL, FP_CELL);
 
   register_dictionary("time.txt");
+  register_dictionary("jailbreak_achievments.txt");
 }
 
 
@@ -487,7 +488,7 @@ public _achiev_register(plugin, params)
   data[ACHIEVMENT_MAX_COUNT] = get_param(5);
 
   static query[80];
-  formatex(query, charsmax(query), "SELECT * FROM `jail_achievments` WHERE `name` = '%s'", data[ACHIEVMENT_NAME]);
+  formatex(query, charsmax(query), "SELECT * FROM `jail_achievments` WHERE `name` = '%L'", LANG_SERVER, data[ACHIEVMENT_NAME]);
   SQL_ThreadQuery(g_pSqlTuple, "DB_AchievmentsRegister_handle", query, data, sizeof(data));
 
   return 1;
@@ -504,19 +505,21 @@ public DB_AchievmentsRegister_handle(fail_state, Handle:query, error[], error_co
   if(SQL_NumResults(query) > 0)
   {
     SQL_QueryMe("UPDATE `jail_achievments` SET \
-      `description` = '%s', \
+      `description` = '%L', \
       `value` = '%d', \
       `needed_count` = '%d', \
       `max_count` = '%d', \
       `status` = '1' \
     WHERE `name` = '%s'",
-    data[ACHIEVMENT_DESCRIPTION], data[ACHIEVMENT_VALUE], data[ACHIEVMENT_NEEDED_COUNT], data[ACHIEVMENT_MAX_COUNT], data[ACHIEVMENT_NAME]);
+    LANG_SERVER, data[ACHIEVMENT_DESCRIPTION], data[ACHIEVMENT_VALUE], data[ACHIEVMENT_NEEDED_COUNT],
+    data[ACHIEVMENT_MAX_COUNT], data[ACHIEVMENT_NAME]);
   }
   else
   {
     SQL_QueryMe("INSERT INTO `jail_achievments` (`name`, `description`, `value`, `needed_count`, `max_count`, `status`) \
-      VALUES ('%s', '%s', '%d', '%d', '%d', '1');",
-      data[ACHIEVMENT_NAME], data[ACHIEVMENT_DESCRIPTION], data[ACHIEVMENT_VALUE], data[ACHIEVMENT_NEEDED_COUNT], data[ACHIEVMENT_MAX_COUNT]);
+      VALUES ('%L', '%L', '%d', '%d', '%d', '1');",
+      LANG_SERVER, data[ACHIEVMENT_NAME], LANG_SERVER, data[ACHIEVMENT_DESCRIPTION], data[ACHIEVMENT_VALUE],
+      data[ACHIEVMENT_NEEDED_COUNT], data[ACHIEVMENT_MAX_COUNT]);
   }
 
   SQL_FreeHandle(query);
@@ -570,9 +573,11 @@ stock find_by_id(db_id)
 
 stock find_by_name(name[])
 {
+  static new_name[64];
+  formatex(new_name, charsmax(new_name), "%L", LANG_SERVER, name);
   for(new i = 0; i < ACHIEVMENT_COUNT; i++)
   {
-    if(equal(name, g_szAchievments[i][ACHIEVMENT_NAME]))
+    if(equal(new_name, g_szAchievments[i][ACHIEVMENT_NAME]))
       return i;
   }
 
