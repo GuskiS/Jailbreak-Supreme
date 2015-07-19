@@ -79,9 +79,10 @@ public plugin_init()
   }
 }
 
-public jail_achivement_load()
+public jail_achivements_load()
 {
-    jail_achiev_register("Open doors", "You must open doors", 10, 1, 1);
+  jail_achiev_register("Open doors", "You must open doors", 10, 1, 1);
+  jail_achiev_register("Close doors", "You must close doors", 10, 1, 1);
 }
 
 public plugin_natives()
@@ -152,7 +153,6 @@ public Ham_Use_pre(ent, id, idactivator, type, Float:value)
 
       if(in_button(ent))
       {
-        jail_achiev_set_progress(id, "Open doors", jail_achiev_get_progress(id, "Open doors") + 1);
         set_task(0.1, "jail_doors", id);
         return HAM_HANDLED;
       }
@@ -233,11 +233,13 @@ public jail_doors(id)
     {
       if(get_door_state(door) == TS_OPENED)
       {
+        jail_achiev_set_progress(id, "Close doors", jail_achiev_get_progress(id, "Close doors") + 1);
         toggle_doors(door, TS_CLOSING);
         newstate = TS_CLOSED;
       }
       else if(get_door_state(door) == TS_CLOSED)
       {
+        jail_achiev_set_progress(id, "Open doors", jail_achiev_get_progress(id, "Open doors") + 1);
         newstate = TS_OPENED;
         if(g_iMapFix == JAIL_ATNAS)
           entity_set_int(door, EV_INT_solid, SOLID_NOT);

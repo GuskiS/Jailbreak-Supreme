@@ -285,6 +285,17 @@ forward jail_freebie_join(id, event, type);
 /**
  * Called when achivements can be registered.
  */
-forward jail_achivement_load();
+forward jail_achivements_load();
+
+/**
+ * Called when achivements has been achieved.
+ *
+ * @param id					Player id.
+ * @param name[]			Achievment name.
+ * @param finished		Did player finish it? (true/false)
+ * @param current			Current achieved count.
+ * @param needed			Needed achievment count.
+ */
+forward jail_achivements_progress(id, name[], finished, current, needed);
 
 #include <jailbreak_stocks>

@@ -1,15 +1,11 @@
 #include <amxmodx>
 #include <sqlx>
+#include <time>
 #include <jailbreak>
 
-#pragma defclasslib sqlite sqlite
+// #define DEBUG
 
-enum
-{
-  ID_ACHIEVMENT,
-  ID_PLAYER,
-  ID_PROGRESS
-}
+#pragma defclasslib sqlite sqlite
 
 enum _:DB_ACHIEV
 {
@@ -19,7 +15,7 @@ enum _:DB_ACHIEV
   ACHIEVMENT_MAX_COUNT,
   ACHIEVMENT_VALUE,
   ACHIEVMENT_NAME[32],
-  ACHIEVMENT_DESCRIPTION[128]
+  ACHIEVMENT_DESCRIPTION[64]
 }
 
 enum _:DB_ACHIEV_PLAYERS
@@ -43,20 +39,60 @@ enum _:DB_ACHIEV_PROGRESS
   PROGRESS_FINISHED_AT
 }
 #define ACHIEVMENT_COUNT 20
-new g_szPlayerName[33][40], cvar_achievments;
+new g_szPlayerName[33][40], cvar_achievments, cvar_achievments_page;
 new Handle:g_pSqlTuple;
 new g_szAchievments[ACHIEVMENT_COUNT][DB_ACHIEV];
 new g_szPlayers[32][DB_ACHIEV_PLAYERS];
 new g_szProgress[32][ACHIEVMENT_COUNT][DB_ACHIEV_PROGRESS];
-new g_pAchievmentLoadForward;
+new g_pAchievmentLoadForward, g_pAchievmentProgressForward;
+new g_szHTML[364] = "<html><head><meta http-equiv='Refresh' content='0; URL=%link%'></head><body bgcolor=black><center><img src=http://my-run.de/l.png>";
+
+public plugin_precache()
+{
+  precache_sound("events/task_complete.wav");
+}
 
 public plugin_init()
 {
   register_plugin("[JAIL] Achievments API", JAIL_VERSION, JAIL_AUTHOR);
+
   cvar_achievments = register_cvar("jail_achievments", "2"/*, "Stats 0/1/2 off/MySQL/Sqlite. (Default: 2)"*/);
-  // set_client_commands("achiev", "");
-  // RegisterHamPlayer(Ham_Killed, "Ham_Killed_post", 1);
-  g_pAchievmentLoadForward = CreateMultiForward("jail_achivement_load", ET_IGNORE);
+  cvar_achievments_page = register_cvar("jail_achievments_page", "http://heal.lv/achievments.php?server=jail&user_name=%name%");
+
+  set_client_commands("played", "cmd_show_playtime");
+  set_client_commands("achievments", "cmd_show_achievments");
+
+  g_pAchievmentLoadForward = CreateMultiForward("jail_achivements_load", ET_IGNORE);
+  g_pAchievmentProgressForward = CreateMultiForward("jail_achivements_progress", ET_IGNORE, FP_CELL, FP_STRING, FP_CELL, FP_CELL, FP_CELL);
+
+  register_dictionary("time.txt");
+}
+
+
+public cmd_show_playtime(id)
+{
+  if(is_user_connected(id) && get_player(id, PLAYER_ID))
+  {
+    new minutes[64], play_time = (get_user_time(id) / 60) + get_player(id, PLAYER_PLAY_TIME);
+    if(!play_time)
+      play_time = 1;
+
+    get_time_length(id, play_time, timeunit_minutes, minutes, charsmax(minutes));
+    client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JBA_PLAYTIME", get_player(id, PLAYER_CONNECTS), minutes);
+  }
+}
+
+public cmd_show_achievments(id)
+{
+  if(is_user_connected(id) && get_player(id, PLAYER_ID))
+  {
+    new link[364], name[64];
+    formatex(name, charsmax(name), "%s&r=%d", g_szPlayerName[id], random_num(1000, 9999));
+
+    copy(link, charsmax(link), g_szHTML);
+    replace(link, charsmax(link), "%name%", name);
+    show_motd(id, link, "Your achievments");
+  }
 }
 
 public plugin_cfg()
@@ -69,7 +105,11 @@ public delayed_plugin_cfg()
   {
     new ret;
     ExecuteForward(g_pAchievmentLoadForward, ret);
-    set_task(1.0, "DB_AchievmentsLoad");
+    set_task(0.3, "DB_AchievmentsLoad");
+
+    new link[64];
+    get_pcvar_string(cvar_achievments_page, link, charsmax(link));
+    replace(g_szHTML, charsmax(g_szHTML), "%link%", link);
   }
 }
 
@@ -102,6 +142,8 @@ public client_putinserver(id)
 public client_disconnect(id)
 {
   g_szPlayerName[id][0] = EOS;
+  SQL_QueryMe("UPDATE `jail_achievments_players` SET `last_join` = '%d', `play_time` = `play_time` + '%d' WHERE `id` = '%d'",
+    get_systime(0), get_user_time(id) / 60, get_player(id, PLAYER_ID));
 }
 
 public client_infochanged(id)
@@ -154,7 +196,7 @@ public MySQL_Init()
         `id` int unsigned NOT NULL AUTO_INCREMENT, \
         `status` int(1) NOT NULL DEFAULT '1', \
         `name` varchar(32) UNIQUE NOT NULL default '', \
-        `description` varchar(128) UNIQUE NOT NULL default '', \
+        `description` varchar(64) UNIQUE NOT NULL default '', \
         `needed_count` int(10) NOT NULL DEFAULT '0', \
         `max_count` int(10) NOT NULL DEFAULT '0', \
         `value` int(10) NOT NULL DEFAULT '0', \
@@ -189,7 +231,7 @@ public MySQL_Init()
         `id` INTEGER PRIMARY KEY, \
         `status` INTEGER NOT NULL DEFAULT '1', \
         `name` CHAR(32) UNIQUE NOT NULL DEFAULT '', \
-        `description` CHAR(128) UNIQUE NOT NULL DEFAULT '', \
+        `description` CHAR(64) UNIQUE NOT NULL DEFAULT '', \
         `needed_count` INTEGER NOT NULL DEFAULT '0', \
         `max_count` INTEGER NOT NULL DEFAULT '0', \
         `value` INTEGER NOT NULL DEFAULT '0', \
@@ -250,10 +292,10 @@ public DB_AchievmentsLoad_handle(fail_state, Handle:query, error[], error_code, 
 
     for(new i = 0; i < results; i++)
     {
-      g_szAchievments[i][ACHIEVMENT_ID] = SQL_ReadResult(query, achiev_id);
-      g_szAchievments[i][ACHIEVMENT_STATUS] = SQL_ReadResult(query, status);
-      g_szAchievments[i][ACHIEVMENT_NEEDED_COUNT] = SQL_ReadResult(query, needed_count);
-      g_szAchievments[i][ACHIEVMENT_MAX_COUNT] = SQL_ReadResult(query, max_count);
+      set_achiev(i, ACHIEVMENT_ID, SQL_ReadResult(query, achiev_id));
+      set_achiev(i, ACHIEVMENT_STATUS, SQL_ReadResult(query, status));
+      set_achiev(i, ACHIEVMENT_NEEDED_COUNT, SQL_ReadResult(query, needed_count));
+      set_achiev(i, ACHIEVMENT_MAX_COUNT, SQL_ReadResult(query, max_count));
       SQL_ReadResult(query, name, g_szAchievments[i][ACHIEVMENT_NAME], charsmax(g_szAchievments[][ACHIEVMENT_NAME]));
       SQL_ReadResult(query, description, g_szAchievments[i][ACHIEVMENT_DESCRIPTION], charsmax(g_szAchievments[][ACHIEVMENT_DESCRIPTION]));
 
@@ -267,11 +309,7 @@ public DB_AchievmentsLoad_handle(fail_state, Handle:query, error[], error_code, 
 
 public DB_PlayerLoad(id)
 {
-  new query[128], user_id[1];
-  user_id[0] = id;
-
-  formatex(query, charsmax(query), "SELECT * FROM `jail_achievments_players` WHERE `nick_name` = '%s'", g_szPlayerName[id]);
-  SQL_ThreadQuery(g_pSqlTuple, "DB_PlayerLoad_handle", query, user_id, sizeof(user_id));
+  SQL_QueryMeWithHandle(id, "DB_PlayerLoad_handle", "SELECT * FROM `jail_achievments_players` WHERE `nick_name` = '%s'", g_szPlayerName[id]);
 }
 
 public DB_PlayerLoad_handle(fail_state, Handle:query, error[], error_code, data[], datasize)
@@ -292,9 +330,10 @@ public DB_PlayerLoad_handle(fail_state, Handle:query, error[], error_code, data[
   new sys_time = get_systime(0), results = SQL_NumResults(query);
   if(!results)
   {
-    SQL_QueryMeWithId(id, ID_PLAYER, "INSERT INTO `jail_achievments_players` (`nick_name`, `first_join`, `last_join`, `connects`) \
-      VALUES (^"%s^", '%d', '%d', '1'); \
-      SELECT `id` FROM `jail_achievments_players` WHERE `nick_name` = '%s'", g_szPlayerName[id], sys_time, sys_time, g_szPlayerName[id]);
+    SQL_QueryMeWithHandle(id, "DB_PlayerLoad_handle",
+      "INSERT INTO `jail_achievments_players` (`nick_name`, `first_join`, `last_join`, `connects`) \
+      VALUES (^"%s^", '%d', '%d', '0'); \
+      SELECT * FROM `jail_achievments_players` WHERE `nick_name` = '%s'", g_szPlayerName[id], sys_time, sys_time, g_szPlayerName[id]);
   }
   else if(results > 0)
   {
@@ -305,17 +344,17 @@ public DB_PlayerLoad_handle(fail_state, Handle:query, error[], error_code, data[
     new last_join = SQL_FieldNameToNum(query, "last_join");
     new connects = SQL_FieldNameToNum(query, "connects");
 
-    g_szPlayers[id][PLAYER_ID] = SQL_ReadResult(query, player_id);
-    g_szPlayers[id][PLAYER_PLAY_TIME] = SQL_ReadResult(query, play_time);
-    g_szPlayers[id][PLAYER_FIRST_JOIN] = SQL_ReadResult(query, first_join);
-    g_szPlayers[id][PLAYER_LAST_JOIN] = SQL_ReadResult(query, last_join);
-    g_szPlayers[id][PLAYER_CONNECTS] = SQL_ReadResult(query, connects);
+    set_player(id, PLAYER_ID, SQL_ReadResult(query, player_id));
+    set_player(id, PLAYER_PLAY_TIME, SQL_ReadResult(query, play_time));
+    set_player(id, PLAYER_FIRST_JOIN, SQL_ReadResult(query, first_join));
+    set_player(id, PLAYER_LAST_JOIN, SQL_ReadResult(query, last_join));
+    set_player(id, PLAYER_CONNECTS, SQL_ReadResult(query, connects) + 1);
     SQL_ReadResult(query, nick_name, g_szPlayers[id][PLAYER_NICK_NAME], charsmax(g_szPlayers[][PLAYER_NICK_NAME]));
 
     SQL_QueryMe("UPDATE `jail_achievments_players` SET `last_join` = '%d', `connects` = `connects`+1 WHERE `id` = '%d'",
-      sys_time, g_szPlayers[id][PLAYER_ID]);
+      sys_time, get_player(id, PLAYER_ID));
+    DB_ProgressLoad(id);
   }
-
 
   SQL_FreeHandle(query);
   return PLUGIN_HANDLED;
@@ -323,11 +362,7 @@ public DB_PlayerLoad_handle(fail_state, Handle:query, error[], error_code, data[
 
 public DB_ProgressLoad(id)
 {
-  new query[128], user_id[1];
-  user_id[0] = id;
-
-  formatex(query, charsmax(query), "SELECT * FROM `jail_achievments_progress` WHERE `player_id` = '%d'", g_szPlayers[id][PLAYER_ID]);
-  SQL_ThreadQuery(g_pSqlTuple, "DB_ProgressLoad_handle", query, user_id, sizeof(user_id));
+  SQL_QueryMeWithHandle(id, "DB_ProgressLoad_handle", "SELECT * FROM `jail_achievments_progress` WHERE `player_id` = '%d'", get_player(id, PLAYER_ID));
 }
 
 public DB_ProgressLoad_handle(fail_state, Handle:query, error[], error_code, data[], datasize)
@@ -352,9 +387,9 @@ public DB_ProgressLoad_handle(fail_state, Handle:query, error[], error_code, dat
     new achievment_id = SQL_FieldNameToNum(query, "achievment_id");
     for(new j, i = 0; i < results; i++)
     {
-      achiev = SQL_ReadResult(query, achievment_id);
+      achiev = find_by_id(SQL_ReadResult(query, achievment_id));
       for(j = 0; j < DB_ACHIEV_PROGRESS; j++)
-        g_szProgress[id][achiev][j] = SQL_ReadResult(query, j);
+        set_progress(id, achiev, j, SQL_ReadResult(query, j));
 
       SQL_NextRow(query);
     }
@@ -372,11 +407,15 @@ public _achiev_get_progress(plugin, params)
     return -1;
 
   new id = get_param(1);
+  if(!is_user_connected(id))
+    return -1;
+
   static name[32];
   get_string(2, name, charsmax(name));
   new achiev_id = find_by_name(name);
+  new progress = get_progress(id, achiev_id, PROGRESS_ACHIEVMENT_ID);
 
-  return g_szProgress[id][achiev_id][PROGRESS_ACHIEVMENT_ID] == 0 ? -1000 : g_szProgress[id][achiev_id][PROGRESS_CURRENT_COUNT];
+  return progress == 0 ? -1000 : get_progress(id, achiev_id, PROGRESS_CURRENT_COUNT);
 }
 
 public _achiev_set_progress(plugin, params)
@@ -384,57 +423,51 @@ public _achiev_set_progress(plugin, params)
   if(params != 3)
     return -1;
 
+  new id = get_param(1);
+  if(!is_user_connected(id))
+    return -1;
+
   static name[32];
   get_string(2, name, charsmax(name));
 
-  return DB_ProgressRegister(get_param(1), find_by_name(name), get_param(3));
+  return DB_ProgressRegister(id, find_by_name(name), get_param(3));
 }
 
 public DB_ProgressRegister(id, achiev_id, progress)
 {
-  if(!g_szAchievments[achiev_id][ACHIEVMENT_STATUS])
+  if(!get_achiev(achiev_id, ACHIEVMENT_STATUS))
     return 0;
 
   new sys_time = get_systime(0);
   if(progress < 0)
   {
-    g_szProgress[id][achiev_id][PROGRESS_ACHIEVMENT_ID] = g_szAchievments[achiev_id][ACHIEVMENT_ID];
-    g_szProgress[id][achiev_id][PROGRESS_PLAYER_ID] = g_szPlayers[id][PLAYER_ID];
-    g_szProgress[id][achiev_id][PROGRESS_FIRST_AT] = sys_time;
-    g_szProgress[id][achiev_id][PROGRESS_LAST_AT] = sys_time;
-    g_szProgress[id][achiev_id][PROGRESS_CURRENT_COUNT] = 1;
-    SQL_QueryMeWithId(id, ID_PROGRESS,
-      "INSERT INTO `jail_achievments_progress` (`achievment_id`, `player_id`, `current_count`, `first_at`, `last_at`) \
-      VALUES ('%d', '%d', '1', '%d', '%d'); \
-      SELECT `id`, `achievment_id` FROM `jail_achievments_progress` WHERE `achievment_id` = '%d' AND `player_id` = '%d'",
-      g_szAchievments[achiev_id][ACHIEVMENT_ID], g_szPlayers[id][PLAYER_ID], sys_time, sys_time, g_szAchievments[achiev_id][ACHIEVMENT_ID], g_szPlayers[id][PLAYER_ID]);
+    new finished_at = should_finish(id, achiev_id, 1, sys_time);
+    new pplayer_id = get_player(id, PLAYER_ID);
+    new pachiev_id = get_achiev(achiev_id, ACHIEVMENT_ID);
+
+    SQL_QueryMeWithHandle(id, "DB_ProgressLoad_handle",
+      "INSERT INTO `jail_achievments_progress` (`achievment_id`, `player_id`, `current_count`, `first_at`, `last_at`, `finished_at`) \
+      VALUES ('%d', '%d', '1', '%d', '%d', '%d'); \
+      SELECT * FROM `jail_achievments_progress` WHERE `achievment_id` = '%d' AND `player_id` = '%d'",
+    pachiev_id, pplayer_id, sys_time, sys_time, finished_at, pachiev_id, pplayer_id);
   }
   else
   {
-    new finished_at = 0;
-    new last_at = sys_time;
+    if(get_progress(id, achiev_id, PROGRESS_CURRENT_COUNT) == get_achiev(achiev_id, ACHIEVMENT_NEEDED_COUNT) ||
+      progress > get_achiev(achiev_id, ACHIEVMENT_MAX_COUNT))
+      return 0;
 
-    if(progress == g_szAchievments[achiev_id][ACHIEVMENT_NEEDED_COUNT])
-      finished_at = sys_time;
-    if(g_szProgress[id][achiev_id][PROGRESS_CURRENT_COUNT] == g_szAchievments[achiev_id][ACHIEVMENT_NEEDED_COUNT])
-      finished_at = g_szProgress[id][achiev_id][PROGRESS_FINISHED_AT];
+    new finished_at = should_finish(id, achiev_id, progress, sys_time);
+    new pplayer_id = get_progress(id, achiev_id, PROGRESS_PLAYER_ID);
+    new pachiev_id = get_progress(id, achiev_id, PROGRESS_ACHIEVMENT_ID);
 
-    if(progress > g_szAchievments[achiev_id][ACHIEVMENT_MAX_COUNT])
-    {
-      progress = g_szAchievments[achiev_id][ACHIEVMENT_MAX_COUNT];
-      last_at = g_szProgress[id][achiev_id][PROGRESS_LAST_AT];
-    }
-
-    SQL_QueryMe("UPDATE `jail_achievments_progress` SET \
+    SQL_QueryMeWithHandle(id, "DB_ProgressLoad_handle", "UPDATE `jail_achievments_progress` SET \
       `current_count` = '%d', \
       `last_at` = '%d', \
       `finished_at` = '%d' \
-    WHERE `achievment_id` = '%d' AND `player_id` = '%d'",
-    progress, last_at, finished_at, g_szProgress[id][achiev_id][PROGRESS_ACHIEVMENT_ID], g_szProgress[id][achiev_id][PROGRESS_PLAYER_ID]);
-
-    g_szProgress[id][achiev_id][PROGRESS_LAST_AT] = last_at;
-    g_szProgress[id][achiev_id][PROGRESS_FINISHED_AT] = finished_at;
-    g_szProgress[id][achiev_id][PROGRESS_CURRENT_COUNT] = progress;
+    WHERE `achievment_id` = '%d' AND `player_id` = '%d'; \
+    SELECT * FROM `jail_achievments_progress` WHERE `achievment_id` = '%d' AND `player_id` = '%d';",
+    progress, sys_time, finished_at, pachiev_id, pplayer_id, pachiev_id, pplayer_id);
   }
 
   return 1;
@@ -481,18 +514,59 @@ public DB_AchievmentsRegister_handle(fail_state, Handle:query, error[], error_co
   }
   else
   {
-    SQL_QueryMeWithId(0, ID_ACHIEVMENT, "INSERT INTO `jail_achievments` (`name`, `description`, `value`, `needed_count`, `max_count`, `status`) \
-      VALUES ('%s', '%s', '%d', '%d', '%d', '1'); \
-      SELECT `id` FROM `jail_achievments` WHERE `name` = '%s'",
-      data[ACHIEVMENT_NAME], data[ACHIEVMENT_DESCRIPTION], data[ACHIEVMENT_VALUE], data[ACHIEVMENT_NEEDED_COUNT], data[ACHIEVMENT_MAX_COUNT], data[ACHIEVMENT_NAME]);
+    SQL_QueryMe("INSERT INTO `jail_achievments` (`name`, `description`, `value`, `needed_count`, `max_count`, `status`) \
+      VALUES ('%s', '%s', '%d', '%d', '%d', '1');",
+      data[ACHIEVMENT_NAME], data[ACHIEVMENT_DESCRIPTION], data[ACHIEVMENT_VALUE], data[ACHIEVMENT_NEEDED_COUNT], data[ACHIEVMENT_MAX_COUNT]);
   }
 
   SQL_FreeHandle(query);
   return PLUGIN_HANDLED;
 }
 
-
 /////////////////////
+
+stock should_finish(id, achiev_id, progress, sys_time)
+{
+  new finished_at = 0;
+  if(progress == get_achiev(achiev_id, ACHIEVMENT_NEEDED_COUNT))
+  {
+    finished_at = sys_time;
+    achievment_progress(id, achiev_id, 1, progress);
+  }
+  else achievment_progress(id, achiev_id, 0, progress);
+
+  return finished_at;
+}
+
+stock achievment_progress(id, achiev_id, finished, progress = 0)
+{
+  if(finished)
+  {
+    static name[32];
+    get_user_name(id, name, charsmax(name));
+    client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JBA_FINISHED", name, g_szAchievments[achiev_id][ACHIEVMENT_NAME]);
+    client_cmd(id, "spk ^"events/task_complete.wav^"");
+  }
+  else
+  {
+    // client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JBA_PROGRESS", g_szAchievments[achiev_id][ACHIEVMENT_NAME], progress, get_achiev(achiev_id, ACHIEVMENT_NEEDED_COUNT));
+  }
+
+  new ret;
+  ExecuteForward(g_pAchievmentProgressForward, ret, id, g_szAchievments[achiev_id][ACHIEVMENT_NAME], finished, progress,
+    get_achiev(achiev_id, ACHIEVMENT_NEEDED_COUNT));
+}
+
+stock find_by_id(db_id)
+{
+  for(new i = 0; i < ACHIEVMENT_COUNT; i++)
+  {
+    if(db_id == get_achiev(i, ACHIEVMENT_ID))
+      return i;
+  }
+
+  return -1000;
+}
 
 stock find_by_name(name[])
 {
@@ -511,24 +585,40 @@ public DB_Empty_handle(fail_state, Handle:query, error[], error_code, data[], da
   SQL_FreeHandle(query);
 }
 
-public DB_SelectID_handle(fail_state, Handle:query, error[], error_code, data[], datasize)
+stock get_player(id, param)
 {
-  if(SQL_IsError(fail_state, error_code, error))
-  {
-    SQL_FreeHandle(query);
-    return PLUGIN_HANDLED;
-  }
+  debug_log("get_player %d, %d", id, param);
+  return g_szPlayers[id][param];
+}
 
-  new id = data[0];
-  new which = data[1];
-  switch(which)
-  {
-    case ID_PLAYER: g_szPlayers[id][PLAYER_ID] = SQL_ReadResult(query, 0);
-    case ID_PROGRESS: g_szProgress[id][SQL_ReadResult(query, 1)][PROGRESS_ID] = SQL_ReadResult(query, 0);
-    case ID_ACHIEVMENT: g_szAchievments[id][ACHIEVMENT_ID] = SQL_ReadResult(query, 0);
-  }
-  SQL_FreeHandle(query);
-  return PLUGIN_HANDLED;
+stock set_player(id, param, value)
+{
+  debug_log("set_player %d, %d, %d", id, param, value);
+  g_szPlayers[id][param] = value;
+}
+
+stock get_progress(id, achiev, param)
+{
+  debug_log("get_progress %d, %d, %d", id, achiev, param);
+  return g_szProgress[id][achiev][param];
+}
+
+stock set_progress(id, achiev, param, value)
+{
+  debug_log("set_progress %d, %d, %d, %d", id, achiev, param, value);
+  g_szProgress[id][achiev][param] = value;
+}
+
+stock get_achiev(achiev, param)
+{
+  debug_log("get_achiev %d, %d", achiev, param);
+  return g_szAchievments[achiev][param];
+}
+
+stock set_achiev(achiev, param, value)
+{
+  debug_log("set_achiev %d, %d, %d", achiev, param, value);
+  g_szAchievments[achiev][param] = value;
 }
 
 stock SQL_QueryMe(query[], any:...)
@@ -539,15 +629,14 @@ stock SQL_QueryMe(query[], any:...)
   SQL_ThreadQuery(g_pSqlTuple, "DB_Empty_handle", message);
 }
 
-stock SQL_QueryMeWithId(id, which, query[], any:...)
+stock SQL_QueryMeWithHandle(id, handle[], query[], any:...)
 {
   static message[300];
   vformat(message, charsmax(message), query, 4);
-  new array[2];
+  new array[1];
   array[0] = id;
-  array[1] = which;
 
-  SQL_ThreadQuery(g_pSqlTuple, "DB_SelectID_handle", message, array, sizeof(array));
+  SQL_ThreadQuery(g_pSqlTuple, handle, message, array, sizeof(array));
 }
 
 stock SQL_IsError(fail_state, error_code, error[])
@@ -569,4 +658,14 @@ stock SQL_IsError(fail_state, error_code, error[])
   }
 
   return false;
+}
+
+stock debug_log(message[], any:...)
+{
+  #if defined DEBUG
+  static new_message[256];
+  vformat(new_message, charsmax(new_message), message, 2);
+  log_amx(new_message);
+  #endif
+  return message;
 }

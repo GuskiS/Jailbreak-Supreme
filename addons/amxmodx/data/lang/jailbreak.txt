@@ -106,3 +106,7 @@ JAIL_OPENEDCELLS = ^3%s^1 opened cells!
 JAIL_CLOSEDCELLS = ^3%s^1 closed cells!
 JAIL_CTLIMIT = Max amount of Guards is %d!
 JAIL_CANTCHANGE = ^3You can't change team!
+
+JBA_PLAYTIME = You have connected ^4%d^1 times and played for ^4%s^1!
+JBA_FINISHED = ^3%s^1 just finished achievment ^4%s^1, congratulations!
+JBA_PROGRESS = You just progressed in achieving ^4%s^1, you have ^4%d^1/^3%d^1!
