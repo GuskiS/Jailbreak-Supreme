@@ -6,12 +6,14 @@
 enum _:MENU_ADMIN
 {
   MENU_BALL,
-  MENU_REVIVE
+  MENU_REVIVE,
+  MENU_BLOCK
 }
 
 new const g_szMenuNames[][] = {
   "BALL_BALLMENU",
-  "JAIL_REVIVE"
+  "JAIL_REVIVE",
+  "JAIL_BLOCKMENU"
 };
 
 public plugin_init()
@@ -58,6 +60,7 @@ public show_menu_handle(id, menu, item)
   {
     case MENU_BALL:	client_cmd(id, "jail_ball");
     case MENU_REVIVE:	revive_show_menu(id);
+    case MENU_BLOCK:	client_cmd(id, "block");
   }
 
   return PLUGIN_HANDLED;

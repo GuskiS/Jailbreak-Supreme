@@ -101,7 +101,7 @@ public plugin_cfg()
 
 public delayed_plugin_cfg()
 {
-  MySQL_Init();
+  DB_Init();
   if(g_pSqlTuple)
   {
     new ret;
@@ -164,7 +164,7 @@ public client_infochanged(id)
   }
 }
 
-public MySQL_Init()
+public DB_Init()
 {
   new cvar = get_pcvar_num(cvar_achievments);
   if(cvar == 1)
@@ -179,7 +179,7 @@ public MySQL_Init()
   else if(cvar == 2)
   {
     SQL_SetAffinity("sqlite");
-    g_pSqlTuple = SQL_MakeDbTuple("localhost", "root", "", "jail_achievments");
+    g_pSqlTuple = SQL_MakeDbTuple("localhost", "root", "", "jailbreak_supreme");
 
   }
   else set_fail_state("[JailBreak] CVAR set wrongly, plugin turning off!");
@@ -642,27 +642,6 @@ stock SQL_QueryMeWithHandle(id, handle[], query[], any:...)
   array[0] = id;
 
   SQL_ThreadQuery(g_pSqlTuple, handle, message, array, sizeof(array));
-}
-
-stock SQL_IsError(fail_state, error_code, error[])
-{
-  if(fail_state == TQUERY_CONNECT_FAILED)
-  {
-    log_amx("[JailBreak] Could not connect to SQL database: %s", error);
-    return true;
-  }
-  else if(fail_state == TQUERY_QUERY_FAILED)
-  {
-    log_amx("[JailBreak] Query failed: %s", error);
-    return true;
-  }
-  else if(error_code)
-  {
-    log_amx("[JailBreak] Error on query: %s", error);
-    return true;
-  }
-
-  return false;
 }
 
 stock debug_log(message[], any:...)

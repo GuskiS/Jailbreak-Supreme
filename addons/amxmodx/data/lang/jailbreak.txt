@@ -106,3 +106,10 @@ JAIL_OPENEDCELLS = ^3%s^1 opened cells!
 JAIL_CLOSEDCELLS = ^3%s^1 closed cells!
 JAIL_CTLIMIT = Max amount of Guards is %d!
 JAIL_CANTCHANGE = ^3You can't change team!
+
+JAIL_BLOCKMENU = Block menu
+JAIL_BLOCK_CT = Block
+JAIL_UNBLOCK_CT = Unblock
+JAIL_BLOCKED = Admin ^3%s^1 blocked access ^3%s^1 to guards team!
+JAIL_UNBLOCKED = Admin ^3%s^1 unblocked access ^3%s^1 to guards team!
+JAIL_YOUHAVEBEENBLOCKED = You have been blocked from guards team!

@@ -414,3 +414,24 @@ stock escape_mysql(string[], len)
   replace_all(string, len, ";", "\;");
   replace_all(string, len, "_", "\_");
 }
+
+stock SQL_IsError(fail_state, error_code, error[])
+{
+  if(fail_state == TQUERY_CONNECT_FAILED)
+  {
+    log_amx("[JAIL] Could not connect to SQL database: %s", error);
+    return true;
+  }
+  else if(fail_state == TQUERY_QUERY_FAILED)
+  {
+    log_amx("[JAIL] Query failed: %s", error);
+    return true;
+  }
+  else if(error_code)
+  {
+    log_amx("[JAIL] Error on query: %s", error);
+    return true;
+  }
+
+  return false;
+}

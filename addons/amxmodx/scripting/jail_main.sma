@@ -98,7 +98,7 @@ public jail_game_start()
 
 public startup_info(id)
 {
-  client_print_color(0, print_team_default, "%s Mod created by %s, skype:guskis1, version: %s!", JAIL_TAG, JAIL_AUTHOR, JAIL_VERSION);
+  client_print_color(id, print_team_default, "%s Mod created by ^3%s^1, ^4skype:guskis1^1, version: ^3%s^1!", JAIL_TAG, JAIL_AUTHOR, JAIL_VERSION);
 }
 
 public Event_RestartRound()
