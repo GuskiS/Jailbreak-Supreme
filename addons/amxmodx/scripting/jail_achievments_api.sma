@@ -94,7 +94,7 @@ public cmd_show_achievments(id)
 {
   if(is_user_connected(id) && get_player(id, PLAYER_ID))
   {
-    if(contain(g_szHTML, "%link%") > -1)
+    if(contain(g_szHTML, "%link%") == -1)
     {
       new link[364], name[64];
       formatex(name, charsmax(name), "%s&r=%d", g_szPlayerName[id], random_num(1000, 9999));
@@ -117,7 +117,7 @@ public delayed_plugin_cfg()
   {
     new ret;
     ExecuteForward(g_pAchievmentLoadForward, ret);
-    set_task(0.3, "DB_AchievmentsLoad");
+    set_task(0.5, "DB_AchievmentsLoad");
 
     new link[64];
     get_pcvar_string(cvar_achievments_page, link, charsmax(link));
@@ -467,7 +467,7 @@ public DB_ProgressRegister(id, achiev_id, progress)
   else
   {
     if(get_progress(id, achiev_id, PROGRESS_CURRENT_COUNT) == get_achiev(achiev_id, ACHIEVMENT_NEEDED_COUNT) ||
-      progress > get_achiev(achiev_id, ACHIEVMENT_MAX_COUNT))
+      (progress > get_achiev(achiev_id, ACHIEVMENT_MAX_COUNT) && get_achiev(achiev_id, ACHIEVMENT_MAX_COUNT)))
       return 0;
 
     new finished_at = should_finish(id, achiev_id, progress, sys_time);
@@ -522,9 +522,9 @@ public DB_AchievmentsRegister_handle(fail_state, Handle:query, error[], error_co
       `needed_count` = '%d', \
       `max_count` = '%d', \
       `status` = '1' \
-    WHERE `name` = '%s'",
+    WHERE `name` = '%L'",
     LANG_SERVER, data[ACHIEVMENT_DESCRIPTION], data[ACHIEVMENT_VALUE], data[ACHIEVMENT_NEEDED_COUNT],
-    data[ACHIEVMENT_MAX_COUNT], data[ACHIEVMENT_NAME]);
+    data[ACHIEVMENT_MAX_COUNT], LANG_SERVER, data[ACHIEVMENT_NAME]);
   }
   else
   {

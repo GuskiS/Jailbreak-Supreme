@@ -104,6 +104,23 @@ public client_putinserver(id)
   DB_BlocksLoad(id);
 }
 
+public client_infochanged(id)
+{
+  if(!is_user_connected(id))
+    return;
+
+  static newname[40], oldname[32];
+  get_user_name(id, oldname, charsmax(oldname));
+  get_user_info(id, "name", newname, charsmax(newname));
+
+  if(!equali(newname, oldname))
+  {
+    g_szUserName[id] = newname;
+    escape_mysql(g_szUserName[id], charsmax(g_szUserName[]));
+    DB_BlocksLoad(id);
+  }
+}
+
 public DB_Init()
 {
   new cvar = get_pcvar_num(cvar_block_ct);

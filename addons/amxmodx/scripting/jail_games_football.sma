@@ -119,6 +119,11 @@ public client_disconnected(id)
     remove_task(id+TASK_NETS);
 }
 
+public jail_achivements_load()
+{
+  jail_achiev_register("JBA_SCOREGOALS", "JBA_SCOREGOALS_DESC", 5, 100, 0);
+}
+
 public jail_gamemode(mode)
 {
   if(mode == GAME_ENDED)
@@ -820,6 +825,7 @@ ball_score()
   if(g_iBallInfo[BI_OWNER] != 0)
     show_hudmessage(0, "%L", LANG_PLAYER, "BALL_SCORED", name, floatround(fdistance));
 
+  jail_achiev_set_progress(g_iBallInfo[BI_OWNER], "JBA_SCOREGOALS", jail_achiev_get_progress(g_iBallInfo[BI_OWNER], "JBA_SCOREGOALS") + 1);
   g_iBallInfo[BI_GOAL] = true;
   ball_move(0);
   set_task(5.0, "ball_move", 1);
