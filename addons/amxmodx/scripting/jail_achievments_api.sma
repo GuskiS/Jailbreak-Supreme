@@ -64,7 +64,7 @@ public plugin_init()
   register_plugin("[JAIL] Achievments API", JAIL_VERSION, JAIL_AUTHOR);
 
   cvar_achievments = register_cvar("jail_achievments", "2"/*, "Stats 0/1/2 off/MySQL/Sqlite. (Default: 2)"*/);
-  cvar_achievments_page = register_cvar("jail_achievments_page", "http://heal.lv/achievments.php?server=jail&user_name=%name%");
+  cvar_achievments_page = register_cvar("jail_achievments_page", ""); // http://heal.lv/achievments.php?server=jail&user_name=%name%
 
   set_client_commands("played", "cmd_show_playtime");
   set_client_commands("progress", "cmd_show_achievments");
@@ -94,13 +94,16 @@ public cmd_show_achievments(id)
 {
   if(is_user_connected(id) && get_player(id, PLAYER_ID))
   {
-    // new link[364], name[64];
-    // formatex(name, charsmax(name), "%s&r=%d", g_szPlayerName[id], random_num(1000, 9999));
-    //
-    // copy(link, charsmax(link), g_szHTML);
-    // replace(link, charsmax(link), "%name%", name);
-    // show_motd(id, link, "Your achievments");
-    show_current_progress(id);
+    if(contain(g_szHTML, "%link%") > -1)
+    {
+      new link[364], name[64];
+      formatex(name, charsmax(name), "%s&r=%d", g_szPlayerName[id], random_num(1000, 9999));
+
+      copy(link, charsmax(link), g_szHTML);
+      replace(link, charsmax(link), "%name%", name);
+      show_motd(id, link, "Your achievments");
+    }
+    else show_current_progress(id);
   }
 }
 
@@ -118,7 +121,8 @@ public delayed_plugin_cfg()
 
     new link[64];
     get_pcvar_string(cvar_achievments_page, link, charsmax(link));
-    replace(g_szHTML, charsmax(g_szHTML), "%link%", link);
+    if(!equal(link, ""))
+      replace(g_szHTML, charsmax(g_szHTML), "%link%", link);
   }
 }
 
