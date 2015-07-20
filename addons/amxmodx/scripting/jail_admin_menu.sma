@@ -60,7 +60,7 @@ public show_menu_handle(id, menu, item)
   {
     case MENU_BALL:	client_cmd(id, "jail_ball");
     case MENU_REVIVE:	revive_show_menu(id);
-    case MENU_BLOCK:	client_cmd(id, "block");
+    case MENU_BLOCK:	client_cmd(id, "jail_block");
   }
 
   return PLUGIN_HANDLED;

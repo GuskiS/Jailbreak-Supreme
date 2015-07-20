@@ -45,8 +45,8 @@ public weapons_show_menu(id)
 {
   if(is_user_alive(id))
   {
-    g_iPlayerPick[id][PICK_WEAPON] = 0;
-    g_iPlayerPick[id][PICK_AMMO] = 0;
+    g_iPlayerPick[id][PICK_WEAPON] = -1;
+    g_iPlayerPick[id][PICK_AMMO] = -1;
     new menu = my_menu_create(id, "JAIL_MENUMENU", "weapons_show_menu_handle");
     static name[32], num[3];
     for(new i = 0; i < sizeof(g_szPriWeap); i++)
@@ -135,14 +135,14 @@ public give_weapons_from(id, user_id)
 {
   new weapon = g_iPlayerPick[id][PICK_WEAPON];
   new ammo = g_iPlayerPick[id][PICK_AMMO];
-  if(weapon)
+  if(weapon > -1)
   {
     static name[33];
     get_weaponname(g_szPriWeap[weapon], name, charsmax(name));
     strip_weapons(user_id);
     new weapon_ent = ham_give_weapon(user_id, name, 1);
 
-    if(ammo)
+    if(ammo > -1)
       cs_set_user_bpammo(user_id, g_szPriWeap[weapon], g_szPriAmmo[weapon]);
     else if(is_valid_ent(weapon_ent))
       cs_set_weapon_ammo(weapon_ent, 0);

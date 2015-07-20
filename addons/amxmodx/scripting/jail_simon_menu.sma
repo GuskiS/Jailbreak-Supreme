@@ -192,7 +192,7 @@ public transfer_show_menu_handle(id, menu, item)
   if(pick == -1)
     return PLUGIN_HANDLED;
 
-  show_player_menu(id, pick, "a", "TR_transfer_show_menu_handle");
+  show_player_menu(id, pick, "e", "TR_transfer_show_menu_handle");
   return PLUGIN_HANDLED;
 }
 

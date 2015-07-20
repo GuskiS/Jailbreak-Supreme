@@ -239,7 +239,7 @@ public set_player_simon(id)
         }
       }
     }
-    else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_MUSTBECT");
+    else client_print_color(id, print_team_default, "%s %L", JAIL_TAG, id, "JAIL_MUSTBECT", id, "JAIL_GUARDS");
   }
 }
 
