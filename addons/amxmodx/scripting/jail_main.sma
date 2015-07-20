@@ -64,6 +64,7 @@ public plugin_natives()
 
 public plugin_cfg()
 {
+  TrieDestroy(g_tCvarsToFile);
   auto_exec_config(JAIL_CONFIGFILE, true);
   g_fRoundTime = get_pcvar_float(cvar_roundtime);
 }
