@@ -38,6 +38,11 @@ public plugin_natives()
   register_native("jail_ask_freebie", "_ask_freebie");
 }
 
+public jail_achivements_load()
+{
+  jail_achiev_register("JBA_FREEBIE", "JBA_FREEBIE_DESC", 5, 100, 0);
+}
+
 public client_disconnect(id)
 {
   end_freeday(id);
@@ -240,6 +245,7 @@ public cmd_freeday_one_handle(id, menu, item)
   menu_destroy(menu);
 
   player = str_to_num(num);
+  jail_achiev_set_progress(player, "JBA_FREEBIE", jail_achiev_get_progress(player, "JBA_FREEBIE") + 1);
   begin_freeday_one(player, SKIN_FREEDAY, true, true);
   set_task(get_pcvar_float(cvar_freeday_time), "end_freeday", player);
 

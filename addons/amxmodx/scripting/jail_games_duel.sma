@@ -103,6 +103,11 @@ public plugin_natives()
   register_native("jail_duel_lastrequest", "_duel_lastrequest");
 }
 
+public jail_achivements_load()
+{
+  jail_achiev_register("JBA_DUELIST", "JBA_DUELIST_DESC", 5, 100, 0);
+}
+
 public client_disconnect(id)
 {
   if(is_duelist(id))
@@ -416,6 +421,7 @@ public end_duel(id)
       {
         new ret;
         ExecuteForward(g_pDuelForwardEnd, ret, id, duel-EXTRA_DUEL, AID, BID);
+        jail_achiev_set_progress(AID, "JBA_DUELIST", jail_achiev_get_progress(AID, "JBA_DUELIST") + 1);
         client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_GAME1_EXTRA2", name[0], duel_name(LANG_SERVER), name[1]);
         null_everything();
 

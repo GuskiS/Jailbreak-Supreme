@@ -1,5 +1,4 @@
 #include <amxmodx>
-#include <hamsandwich>
 #include <jailbreak>
 
 public plugin_init()
@@ -7,6 +6,7 @@ public plugin_init()
   register_plugin("[JAIL] Basic achievments", JAIL_VERSION, JAIL_AUTHOR);
 
   register_event("DeathMsg", "Event_DeathMsg", "a");
+  register_event("23", "Event_Spray", "a", "1=112");
 }
 
 public jail_achivements_load()
@@ -18,6 +18,7 @@ public jail_achivements_load()
   jail_achiev_register("JBA_KILLS_HEADSHOT", "JBA_KILLS_HEADSHOT_DESC", 2, 200, 0);
   jail_achiev_register("JBA_ROUND_SURVIVED", "JBA_ROUND_SURVIVED_DESC", 3, 500, 0);
   jail_achiev_register("JBA_ROUND_STARTED", "JBA_ROUND_STARTED_DESC", 2, 1000, 0);
+  jail_achiev_register("JBA_SPRAYER", "JBA_SPRAYER_DESC", 2, 200, 0);
 }
 
 public jail_gamemode(mode)
@@ -70,4 +71,10 @@ public Event_DeathMsg()
 
   if(read_data(2))
     jail_achiev_set_progress(killer, "JBA_KILLS_HEADSHOT", jail_achiev_get_progress(killer, "JBA_KILLS_HEADSHOT") + 1);
+}
+
+public Event_Spray()
+{
+  new id = read_data(2);
+  jail_achiev_set_progress(id, "JBA_SPRAYER", jail_achiev_get_progress(id, "JBA_SPRAYER") + 1);
 }

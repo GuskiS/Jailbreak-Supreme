@@ -416,12 +416,12 @@ public DB_ProgressLoad_handle(fail_state, Handle:query, error[], error_code, dat
 
 public _achiev_get_progress(plugin, params)
 {
-  if(params != 2)
-    return -1;
+  if(params != 2 || get_playersnum() < 3)
+    return -1000;
 
   new id = get_param(1);
   if(!is_user_connected(id))
-    return -1;
+    return -1000;
 
   static name[32];
   get_string(2, name, charsmax(name));
@@ -433,7 +433,7 @@ public _achiev_get_progress(plugin, params)
 
 public _achiev_set_progress(plugin, params)
 {
-  if(params != 3)
+  if(params != 3 || get_playersnum() < 3)
     return -1;
 
   new id = get_param(1);

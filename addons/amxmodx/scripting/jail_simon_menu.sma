@@ -90,7 +90,7 @@ public cmd_show_menu(id)
 
 public show_menu_handle(id, menu, item)
 {
-  new pick = my_menu_item(id, item, menu);
+  new pick = my_menu_item_alive(id, item, menu);
   if(pick == -1)
     return PLUGIN_HANDLED;
 
@@ -173,7 +173,7 @@ public duration_show_menu(id, pick)
 
 public blind_show_menu_handle(id, menu, item)
 {
-  new user_id = my_menu_item(id, item, menu);
+  new user_id = my_menu_item_alive(id, item, menu);
   if(user_id == -1)
     return PLUGIN_HANDLED;
 
@@ -188,17 +188,17 @@ public blind_show_menu_handle(id, menu, item)
 
 public transfer_show_menu_handle(id, menu, item)
 {
-  new pick = my_menu_item(id, item, menu);
+  new pick = my_menu_item_connected(id, item, menu);
   if(pick == -1)
     return PLUGIN_HANDLED;
 
-  show_player_menu(id, pick, "ae", "TR_transfer_show_menu_handle");
+  show_player_menu(id, pick, "a", "TR_transfer_show_menu_handle");
   return PLUGIN_HANDLED;
 }
 
 public nades_show_menu_handle(id, menu, item)
 {
-  new pick = my_menu_item(id, item, menu);
+  new pick = my_menu_item_connected(id, item, menu);
   if(pick == -1)
     return PLUGIN_HANDLED;
 
@@ -224,7 +224,7 @@ public nades_show_menu_handle(id, menu, item)
 
 public TR_transfer_show_menu_handle(id, menu, item)
 {
-  new user_id = my_menu_item(id, item, menu);
+  new user_id = my_menu_item_connected(id, item, menu);
   if(user_id == -1)
     return PLUGIN_HANDLED;
 
@@ -232,6 +232,7 @@ public TR_transfer_show_menu_handle(id, menu, item)
   static name[2][32];
   get_user_name(user_id, name[0], charsmax(name[]));
   get_user_name(id, name[1], charsmax(name[]));
+  new alive = is_user_alive(user_id);
 
   if(team == CS_TEAM_T)
   {
@@ -243,15 +244,19 @@ public TR_transfer_show_menu_handle(id, menu, item)
     cs_set_player_team(user_id, CS_TEAM_T);
     client_print_color(0, print_team_default, "%s %L", JAIL_TAG, LANG_SERVER, "JAIL_TRANSFER_C", name[0], LANG_SERVER, "JAIL_PRISONERS", name[1]);
   }
-  strip_weapons(user_id);
-  ExecuteHamB(Ham_CS_RoundRespawn, user_id);
+
+  if(alive)
+  {
+    strip_weapons(user_id);
+    ExecuteHamB(Ham_CS_RoundRespawn, user_id);
+  }
 
   return PLUGIN_HANDLED;
 }
 
 public DO_nades_show_menu_handle(id, menu, item)
 {
-  new user_id = my_menu_item(id, item, menu);
+  new user_id = my_menu_item_alive(id, item, menu);
   if(user_id == -1)
     return PLUGIN_HANDLED;
 
@@ -267,7 +272,7 @@ public DO_nades_show_menu_handle(id, menu, item)
 
 public MIC_transfer_show_menu_handle(id, menu, item)
 {
-  new user_id = my_menu_item(id, item, menu);
+  new user_id = my_menu_item_connected(id, item, menu);
   if(user_id == -1)
     return PLUGIN_HANDLED;
 
@@ -279,7 +284,7 @@ public MIC_transfer_show_menu_handle(id, menu, item)
 
 public duration_show_menu_handle(id, menu, item)
 {
-  new pick = my_menu_item(id, item, menu);
+  new pick = my_menu_item_connected(id, item, menu);
   if(pick == -1)
     return PLUGIN_HANDLED;
 
@@ -293,7 +298,7 @@ public duration_show_menu_handle(id, menu, item)
 
 public skin_show_menu_handle(id, menu, item)
 {
-  new user_id = my_menu_item(id, item, menu);
+  new user_id = my_menu_item_alive(id, item, menu);
   if(user_id == -1)
     return PLUGIN_HANDLED;
 
@@ -318,7 +323,7 @@ public skin_show_menu_handle(id, menu, item)
 
 public PL_skin_show_menu_handle(id, menu, item)
 {
-  new pick = my_menu_item(id, item, menu);
+  new pick = my_menu_item_alive(id, item, menu);
   if(pick == -1 || !is_user_alive(g_iPlayerPick[id]))
     return PLUGIN_HANDLED;
 
@@ -375,9 +380,24 @@ stock my_menu_create(id, name[], handle[])
   return menu_create(option, handle);
 }
 
-stock my_menu_item(id, item, menu)
+stock my_menu_item_alive(id, item, menu)
 {
   if(item == MENU_EXIT || !is_user_alive(id) || !my_check(id))
+  {
+    menu_destroy(menu);
+    return -1;
+  }
+
+  new access, callback, num[3];
+  menu_item_getinfo(menu, item, access, num, charsmax(num), _, _, callback);
+  menu_destroy(menu);
+
+  return str_to_num(num);
+}
+
+stock my_menu_item_connected(id, item, menu)
+{
+  if(item == MENU_EXIT || !is_user_connected(id) || !my_check(id))
   {
     menu_destroy(menu);
     return -1;
