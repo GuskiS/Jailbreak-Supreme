@@ -21,7 +21,7 @@ public plugin_init()
 {
   register_plugin("[JAIL] Freeday", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_freeday_time = register_cvar("jail_freeday_time", "60");
+  cvar_freeday_time = my_register_cvar("jail_freeday_time", "60", "Freeday duration in seconds. (Default: 60)");
 
   RegisterHamPlayer(Ham_Killed, "Ham_Killed_pre", 0);
 

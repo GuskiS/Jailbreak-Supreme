@@ -39,7 +39,7 @@ public plugin_init()
 {
   register_plugin("[JAIL] Protection day", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_prot_time_delay = register_cvar("jail_prot_time_delay", "15.0");
+  cvar_prot_time_delay = my_register_cvar("jail_prot_time_delay", "15.0", "Time before start of Protection day. (Default: 15.0)");
 
   formatex(g_szDayName, charsmax(g_szDayName), "%L", LANG_PLAYER, "JAIL_DAY2");
   g_pMyNewDay = jail_day_add(g_szDayName, "prot", 1);

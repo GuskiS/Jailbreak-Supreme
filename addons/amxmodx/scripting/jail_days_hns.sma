@@ -17,8 +17,8 @@ public plugin_init()
 {
   register_plugin("[JAIL] HNS day", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_hns_time_delay = register_cvar("jail_hns_time_delay", "60.0");
-  cvar_hns_distance = register_cvar("jail_hns_distance", "300.0");
+  cvar_hns_time_delay = my_register_cvar("jail_hns_time_delay", "60.0",   "Time before start of HNS day. (Default: 60.0)");
+  cvar_hns_distance   = my_register_cvar("jail_hns_distance",   "300.0",  "Radius in which seekers can see. (Default: 300.0)");
 
   formatex(g_szDayName, charsmax(g_szDayName), "%L", LANG_PLAYER, "JAIL_DAY9");
   g_pMyNewDay = jail_day_add(g_szDayName, "hns", 1);

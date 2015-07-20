@@ -33,10 +33,12 @@ stock const g_szKnifeModel[][] = {"models/suprjail/p_crowbar.mdl", "models/suprj
 #define JAIL_CHATCOMMAND	16 // Max length of days name.
 
 #define JAIL_ADMIN_ACCESS ADMIN_LEVEL_B // N
+#define JAIL_CONFIGFILE "jailbreak_supreme.cfg"
 
 #define day_equal(%0) jail_get_globalinfo(GI_DAY) == %0
 #define game_equal(%0) jail_get_globalinfo(GI_GAME) == %0
 #define duel_equal(%0) jail_get_globalinfo(GI_DUEL) == %0
+
 
 #pragma semicolon 1
 

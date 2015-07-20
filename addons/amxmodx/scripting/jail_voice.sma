@@ -15,7 +15,7 @@ public plugin_init()
   RegisterHamPlayer(Ham_Killed, "Ham_Killed_post", 1);
   register_forward(FM_Voice_SetClientListening, "Forward_SetClientListening");
 
-  cvar_talk_mode = register_cvar("jail_talk_mode", "3");//0-simon only, 1-simon+ct, 2-simon+admin, 3-simon+ct+admin, 4-all
+  cvar_talk_mode = my_register_cvar("jail_talk_mode", "3", "Who can talk: 0-simon, 1-simon+ct, 2-simon+admin, 3-simon+ct+admin, 4-all. (Default: 3)");
 
   register_clcmd("+simonvoice", "cmd_voiceon");
   register_clcmd("-simonvoice", "cmd_voiceoff");

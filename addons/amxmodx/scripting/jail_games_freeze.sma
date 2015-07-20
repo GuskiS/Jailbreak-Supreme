@@ -17,8 +17,8 @@ public plugin_init()
 {
   register_plugin("[JAIL] Freeze game", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_freeze_maxspeed = register_cvar("jail_freeze_maxspeed", "330.0");
-  cvar_freeze_time_delay = register_cvar("jail_freeze_time_delay", "30.0");
+  cvar_freeze_maxspeed    = my_register_cvar("jail_freeze_maxspeed",    "330.0",  "Freeze speed for catchers. (Default: 330.0)");
+  cvar_freeze_time_delay  = my_register_cvar("jail_freeze_time_delay",  "30.0",   "Time before start of Freeze game. (Default: 30.0)");
 
   DisableHamForward((g_pHamForwards[0] = RegisterHamPlayer(Ham_Touch, "Ham_Touch_pre", 0)));
   DisableHamForward((g_pHamForwards[1] = RegisterHamPlayer(Ham_TraceAttack, "Ham_TraceAttack_pre", 0)));

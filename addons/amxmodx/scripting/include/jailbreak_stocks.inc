@@ -28,6 +28,12 @@ stock set_player_model(id, model[], skin)
   jail_set_playerdata(id, PD_SKIN, skin);
 }
 
+stock my_register_cvar(name[], string[], description[], flags = 0, Float:fvalue = 0.0)
+{
+  jail_register_cvar(name, string, description);
+  return register_cvar(name, string, flags, fvalue);
+}
+
 stock auto_exec_config(const szName[], bool:bAutoCreate=true)
 {
   new szFileName[32];

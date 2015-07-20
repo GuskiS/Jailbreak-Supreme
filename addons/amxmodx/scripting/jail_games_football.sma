@@ -86,8 +86,8 @@ public plugin_init()
 {
   register_plugin("[JAIL] Game: Football", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_ball_speed = register_cvar("jail_ball_speed", "230.0");
-  cvar_ball_velocity = register_cvar("jail_ball_velocity", "600");
+  cvar_ball_speed     = my_register_cvar("jail_ball_speed",     "230.0",  "Player movement speed with ball. (Default: 230.0)");
+  cvar_ball_velocity  = my_register_cvar("jail_ball_velocity",  "600",    "Ball kick speed. (Default: 600)");
 
   DisableHamForward((g_pHamHooks[0] = RegisterHam(Ham_Touch, "info_target", "Ham_Touch_pre", 0)));
   DisableHamForward((g_pHamHooks[1] = RegisterHam(Ham_Think, "info_target", "Ham_Think_pre", 0)));

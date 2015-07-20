@@ -12,7 +12,7 @@ public plugin_init()
 {
   register_plugin("[JAIL] Words game", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_words_time = register_cvar("jail_words_time", "15");
+  cvar_words_time = my_register_cvar("jail_words_time", "15", "Time to answser correctly. (Default: 15.0)");
   register_clcmd("jail_my_word", "pick_the_word");
 
   register_clcmd("say", "hook_say");

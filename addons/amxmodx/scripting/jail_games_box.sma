@@ -9,7 +9,7 @@ public plugin_init()
 {
   register_plugin("[JAIL] Box", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_box_players = register_cvar("jail_box_players", "6");
+  cvar_box_players = my_register_cvar("jail_box_players", "6", "Max players for box. (Default: 6)");
 
   formatex(g_szGameName, charsmax(g_szGameName), "%L", LANG_PLAYER, "JAIL_GAME0");
   g_pMyNewGame = jail_game_add(g_szGameName, "box", 1);

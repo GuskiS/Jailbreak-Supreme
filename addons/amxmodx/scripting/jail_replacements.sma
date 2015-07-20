@@ -34,8 +34,9 @@ public plugin_init()
 {
   register_plugin("[JAIL] Replacements", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_remove_money = register_cvar("jail_remove_money", "1");
-  cvar_prisoner_grenade = register_cvar("jail_prisoner_grenade", "0");
+  cvar_remove_money     = my_register_cvar("jail_remove_money",     "1", "Removes money. (Default: 1)");
+  cvar_prisoner_grenade = my_register_cvar("jail_prisoner_grenade", "0", "Can prisoners pick nades? (Default: 0)");
+
   register_message(get_user_msgid("TextMsg"), "Message_Block");
   register_event("TeamInfo", "Event_TeamInfo", "a");
   register_forward(FM_EmitSound, "Forward_EmitSound_pre", 0);

@@ -14,20 +14,21 @@ new g_iPlayerData[33][PLAYERDATA], g_iHideBody[33];
 new g_iGlobalInfo[GLOBALINFO];
 new Float:g_fFreezeTime, Float:g_fRoundTime, Float:g_fRoundStart;
 new cvar_preparation_time, cvar_simon_steps, cvar_crowbar_count, cvar_roundtime, cvar_pick_time, cvar_pick_what;
+new Trie:g_tCvarsToFile, g_iTrieSize;
 new g_pGameModeForward;
 
 public plugin_init()
 {
-  register_plugin("Supreme JailBreak", JAIL_VERSION, JAIL_AUTHOR);
+  register_plugin("JailBreak Supreme", JAIL_VERSION, JAIL_AUTHOR);
   register_cvar("jail_server_version", JAIL_VERSION, FCVAR_SERVER|FCVAR_EXTDLL|FCVAR_SPONLY);
 
-  cvar_preparation_time = register_cvar("jail_preparation_time", "5");//seconds
-  cvar_pick_time = register_cvar("jail_pick_time", "30");//pick time
-  cvar_pick_what = register_cvar("jail_pick_what", "3");//0-none, 1-random simon, 2-freeday, 3-random choice between 1 and 2
-  cvar_roundtime = register_cvar("jail_roundtime", "10");//MINUTES
-  register_cvar("jail_admin_access", "1"); // should admins be allowed access things without being simon?
-  cvar_crowbar_count = register_cvar("jail_crowbar_count", "1");
-  cvar_simon_steps = register_cvar("jail_simon_steps", "1");
+  cvar_preparation_time   = mynew_register_cvar("jail_preparation_time",  "5",  "Time before game actually starts in seconds (Default: 5)");
+  cvar_pick_time          = mynew_register_cvar("jail_pick_time",         "30", "Time in which simon should be picked. (Default: 30)");
+  cvar_pick_what          = mynew_register_cvar("jail_pick_what",         "3",  "0-none, 1-random simon, 2-freeday, 3-random 1 or 2. (Default: 3)");
+  cvar_roundtime          = mynew_register_cvar("jail_roundtime",         "10", "Default roundtime in minutes. (Default: 10)");
+  cvar_crowbar_count      = mynew_register_cvar("jail_crowbar_count",     "1",  "Number of crowbars. (Default: 1)");
+  cvar_simon_steps        = mynew_register_cvar("jail_simon_steps",       "1",  "Show simon steps. (Default: 1)");
+  mynew_register_cvar("jail_admin_access",      "1",  "Can admin do things without being simon. (Default: 1)");
 
   set_msg_block(get_user_msgid("ClCorpse"), BLOCK_SET);
   register_event("ClCorpse", "Message_ClCorpse", "a", "10=0");
@@ -58,11 +59,12 @@ public plugin_natives()
   register_native("jail_set_globalinfo", "_set_globalinfo");
   register_native("jail_get_roundtime", "_get_roundtime");
   register_native("jail_player_crowbar", "_player_crowbar");
+  register_native("jail_register_cvar",	"_register_cvar");
 }
 
 public plugin_cfg()
 {
-  auto_exec_config("jailbreak", true);
+  auto_exec_config(JAIL_CONFIGFILE, true);
   g_fRoundTime = get_pcvar_float(cvar_roundtime);
 }
 
@@ -363,10 +365,93 @@ public create_body(id, Float:origin[3], model[], seq)
 }
 
 //MYFUNC
-get_game_mode()
+stock mynew_register_cvar(name[], string[], description[], flags = 0, Float:fvalue = 0.0)
+{
+  new_register_cvar(name, string, description);
+  return register_cvar(name, string, flags, fvalue);
+}
+
+stock new_register_cvar(name[], string[], description[], plug[] = "jail_main.amxx")
+{
+  static path[96];
+  if(!path[0])
+  {
+    get_localinfo("amxx_configsdir", path, charsmax(path));
+    format(path, charsmax(path), "%s/%s", path, JAIL_CONFIGFILE);
+  }
+
+  new file;
+  if(!g_tCvarsToFile)
+    g_tCvarsToFile = TrieCreate();
+
+  if(!file_exists(path))
+  {
+    file = fopen(path, "wt");
+    if(!file)
+      return 0;
+
+    fprintf(file, "// Server specific.^n");
+    fprintf(file, "%-32s %-8s // %-32s // %s^n", "mp_tkpunish", "0",				plug, "Disables TeamKill punishments");
+    fprintf(file, "%-32s %-8s // %-32s // %s^n", "mp_friendlyfire", "0",			plug, "Disables friendly fire");
+    fprintf(file, "%-32s %-8s // %-32s // %s^n", "mp_limitteams", "0",				plug, "Disables team limits");
+    fprintf(file, "%-32s %-8s // %-32s // %s^n", "mp_autoteambalance", "0",			plug, "Disables team limits");
+    fprintf(file, "%-32s %-8s // %-32s // %s^n", "mp_freezetime", "0",				plug, "Disables freeze time on round start");
+    fprintf(file, "%-32s %-8s // %-32s // %s^n", "mp_playerid", "2",				plug, "Disables team info when aiming on player");
+    fprintf(file, "%-32s %-8s // %-32s // %s^n", "sv_allktalk", "1",				plug, "Enables alltalk");
+    fprintf(file, "%-26s %-14s // %-32s // %s^n", "amx_statscfg", "off PlayerName",	plug, "Disables player name when aiming on player");
+    fprintf(file, "^n");
+    fprintf(file, "// Mod specific.^n");
+  }
+  else
+  {
+    file = fopen(path, "rt");
+    if(!file)
+      return 0;
+
+    //if(!TrieGetSize(g_tCvarsToFile))
+    if(!g_iTrieSize)
+    {
+      new newline[48];
+      static line[128];
+      while(!feof(file))
+      {
+        fgets(file, line, charsmax(line));
+        if(line[0] == ';' || !line[0])
+          continue;
+
+        parse(line, newline, charsmax(newline));
+        remove_quotes(newline);
+        #if AMXX_VERSION_NUM >= 183
+          TrieSetCell(g_tCvarsToFile, newline, 1, false);
+        #else
+          TrieSetCell(g_tCvarsToFile, newline, 1);
+        #endif
+        g_iTrieSize++;
+      }
+    }
+    fclose(file);
+    file = fopen(path, "at");
+  }
+
+  if(!TrieKeyExists(g_tCvarsToFile, name))
+  {
+    fprintf(file, "%-32s %-8s // %-32s // %s^n", name, string, plug, description);
+    #if AMXX_VERSION_NUM >= 183
+      TrieSetCell(g_tCvarsToFile, name, 1, false);
+    #else
+      TrieSetCell(g_tCvarsToFile, name, 1);
+    #endif
+    g_iTrieSize++;
+  }
+
+  fclose(file);
+  return 1;
+}
+
+stock get_game_mode()
   return g_iGameMode;
 
-set_game_mode(value)
+stock set_game_mode(value)
 {
   if(value == GAME_RESTARTING)
     log_amx("[JAIL] Game has restarted :(");
@@ -376,26 +461,26 @@ set_game_mode(value)
   ExecuteForward(g_pGameModeForward, ret, value);
 }
 
-get_player_data(id, pd)
+stock get_player_data(id, pd)
   return g_iPlayerData[id][pd];
 
-set_player_data(id, pd, value)
+stock set_player_data(id, pd, value)
 {
   if(pd == PD_SIMON && get_player_data(id, pd))
     set_user_simon(id, value, 0);
   else g_iPlayerData[id][pd] = value;
 }
 
-get_global_info(gi)
+stock get_global_info(gi)
   return g_iGlobalInfo[gi];
 
-set_global_info(gi, value)
+stock set_global_info(gi, value)
   g_iGlobalInfo[gi] = value;
 
-Float:get_roundtime()
+stock Float:get_roundtime()
   return get_gametime() - g_fRoundStart - g_fFreezeTime;
 
-set_user_simon(id, value, killer=0, print=0)
+stock set_user_simon(id, value, killer=0, print=0)
 {
   set_global_info(GI_SIMON, value ? id : 0);
   g_iPlayerData[id][PD_SIMON] = value;
@@ -413,7 +498,7 @@ set_user_simon(id, value, killer=0, print=0)
   }
 }
 
-reset_user_all()
+stock reset_user_all()
 {
   new num, id;
   static players[32];
@@ -426,7 +511,7 @@ reset_user_all()
   }
 }
 
-reset_user_one(id)
+stock reset_user_one(id)
 {
   new i;
   for(i = 0; i < PLAYERDATA; i++)
@@ -441,7 +526,7 @@ reset_user_one(id)
     remove_task(id);
 }
 
-reset_global_info()
+stock reset_global_info()
 {
   remove_my_tasks(1, 1);
   remove_entity_name("dead_body");
@@ -454,7 +539,7 @@ reset_global_info()
   }
 }
 
-remove_my_tasks(v1, v2)
+stock remove_my_tasks(v1, v2)
 {
   if(v1)
   {
@@ -469,14 +554,14 @@ remove_my_tasks(v1, v2)
   }
 }
 
-xs_vec_copy(const Float:vecIn[], Float:vecOut[])
+stock xs_vec_copy(const Float:vecIn[], Float:vecOut[])
 {
   vecOut[0] = vecIn[0];
   vecOut[1] = vecIn[1];
   vecOut[2] = vecIn[2];
 }
 
-get_t_attack_ct(attacker, victim)
+stock get_t_attack_ct(attacker, victim)
 {
   if(cs_get_user_team(attacker) == CS_TEAM_T && cs_get_user_team(victim) == CS_TEAM_CT)
     return 1;
@@ -560,4 +645,18 @@ public _player_crowbar(plugin, params)
     ExecuteHamB(Ham_Item_Deploy, find_ent_by_owner(-1, "weapon_knife", id));
 
   return value;
+}
+
+public _register_cvar(plugin, params)
+{
+  if(params != 3)
+    return -1;
+
+  static name[48], string[16], pluginname[48], description[128];
+  get_string(1, name, charsmax(name));
+  get_string(2, string, charsmax(string));
+  get_string(3, description, charsmax(description));
+  get_plugin(plugin, pluginname, charsmax(pluginname));
+
+  return new_register_cvar(name, string, description, pluginname);
 }

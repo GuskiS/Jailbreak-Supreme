@@ -65,9 +65,9 @@ public plugin_init()
 {
   register_plugin("[JAIL] Jedi day", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_jedi_maxspeed = register_cvar("jail_jedi_maxspeed", "290.0");
-  cvar_jedi_gravity = register_cvar("jail_jedi_gravity", "0.5");
-  cvar_jedi_hp = register_cvar("jail_jedi_hp", "50");
+  cvar_jedi_maxspeed  = my_register_cvar("jail_jedi_maxspeed",  "290.0",  "Jedi speed. (Default: 290.0)");
+  cvar_jedi_gravity   = my_register_cvar("jail_jedi_gravity",   "0.5",    "Jedi gravity. (Default: 0.5)");
+  cvar_jedi_hp        = my_register_cvar("jail_jedi_hp",        "50",     "Jedi health. (Default: 50)");
 
   DisableHamForward((g_pHamHooks[0] = RegisterHamPlayer(Ham_Killed, "Ham_Killed_pre", 0)));
   DisableHamForward((g_pHamHooks[1] = RegisterHam(Ham_Item_Deploy, "weapon_knife", "Ham_Item_Deploy_post", 1)));

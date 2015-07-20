@@ -29,7 +29,7 @@ public plugin_init()
 {
   register_plugin("[JAIL] Snow day", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_snowday_velocity = register_cvar("jail_snowday_velocity", "1300");
+  cvar_snowday_velocity = my_register_cvar("jail_snowday_velocity", "1300", "Snowballs velocity. (Default: 1300)");
   g_pTextMsgID = get_user_msgid("TextMsg");
   g_pSendAudioID = get_user_msgid("SendAudio");
 

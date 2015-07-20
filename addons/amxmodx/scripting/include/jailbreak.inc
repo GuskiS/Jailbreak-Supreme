@@ -197,7 +197,7 @@ native jail_duel_lastrequest();
 native jail_ask_freebie(event, type);
 
 /**
- * Register achiement.
+ * Register achievement.
  *
  * @param name[]			Achievment name.
  * @param desc[]			Achievment description.
@@ -209,7 +209,7 @@ native jail_ask_freebie(event, type);
 native jail_achiev_register(name[], desc[], value, needed, max = 0);
 
 /**
- * Register achiement.
+ * Register progress.
  *
  * @param id					User game id.
  * @param name[]			Achievment name.
@@ -218,6 +218,16 @@ native jail_achiev_register(name[], desc[], value, needed, max = 0);
  */
 native jail_achiev_get_progress(id, name[]);
 native jail_achiev_set_progress(id, name[], progress);
+
+/**
+ * Register cvar to file.
+ *
+ * @param name[]			Cvar name.
+ * @param string[]		Cvar value.
+ * @param desc[]			Cvar description.
+ * @return						true/false.
+ */
+native jail_register_cvar(name[], string[], desc[]);
 
 /**
  * Called when game mode changes.
