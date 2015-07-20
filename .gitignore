@@ -1,5 +1,6 @@
 *.exe
 *.dll
+/addons/amxmodx/scripting/compiled
 /addons/amxmodx/scripting/include/amxbans
 /addons/amxmodx/scripting/include/amxbans_core.inc
 /addons/amxmodx/scripting/include/core.inc
@@ -93,3 +94,4 @@
 /addons/amxmodx/scripting/include/vector.inc
 /addons/amxmodx/scripting/include/vip.inc
 /addons/amxmodx/scripting/include/vip_heal.inc
+addons/amxmodx/scripting/compile.dat

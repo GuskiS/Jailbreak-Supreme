@@ -1,0 +1,31 @@
+[en]
+JBA_PLAYTIME = You have connected ^4%d^1 times and played for ^4%s^1!
+JBA_FINISHED = ^3%s^1 just finished achievement ^4%s^1, congratulations!
+JBA_PROGRESS = You just progressed in achieving ^4%s^1, you have ^4%d^1/^3%d^1!
+JBA_YOURPROGRESS = Your achievement progress
+
+JBA_MANAGECELLS = Manage cells
+JBA_MANAGECELLS_DESC = You must open or close cells
+
+JBA_SCOREGOALS = Soccer PRO
+JBA_SCOREGOALS_DESC = Score goals in soccer field
+JBA_CONNECTSERVER = Become an addict
+JBA_CONNECTSERVER_DESC = Play as much you can
+JBA_SUICIDES = Unlucky ending
+JBA_SUICIDES_DESC = Die from suicide
+JBA_KILLS_GRENADE = Bomberman
+JBA_KILLS_GRENADE_DESC = Blow up everyone
+JBA_KILLS_KNIFE = Butcher
+JBA_KILLS_KNIFE_DESC = Knife everyone down
+JBA_KILLS_HEADSHOT = Sharpshooter
+JBA_KILLS_HEADSHOT_DESC = Aim for head
+JBA_ROUND_SURVIVED = Survivor
+JBA_ROUND_SURVIVED_DESC = Survive till round end
+JBA_ROUND_STARTED = Be there
+JBA_ROUND_STARTED_DESC = Start rounds
+JBA_DUELIST = Duelist
+JBA_DUELIST_DESC = Defeat your opponent in duels
+JBA_FREEBIE = Be free
+JBA_FREEBIE_DESC = Get freedays
+JBA_SPRAYER = Spray it
+JBA_SPRAYER_DESC = Mark your territory with spray
