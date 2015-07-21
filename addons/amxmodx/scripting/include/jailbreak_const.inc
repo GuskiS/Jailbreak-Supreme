@@ -22,7 +22,7 @@
   #endif
 #endif
 
-#define JAIL_VERSION	"1.1.3"
+#define JAIL_VERSION	"1.1.4"
 #define JAIL_AUTHOR		"GuskiS"
 #define JAIL_TAG		"^3[^4JailBreak^3]^1"
 

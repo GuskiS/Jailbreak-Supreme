@@ -142,7 +142,7 @@ public give_weapons_from(id, user_id)
     strip_weapons(user_id);
     new weapon_ent = ham_give_weapon(user_id, name, 1);
 
-    if(ammo > -1)
+    if(ammo)
       cs_set_user_bpammo(user_id, g_szPriWeap[weapon], g_szPriAmmo[weapon]);
     else if(is_valid_ent(weapon_ent))
       cs_set_weapon_ammo(weapon_ent, 0);

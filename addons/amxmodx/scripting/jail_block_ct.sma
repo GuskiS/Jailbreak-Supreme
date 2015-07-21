@@ -15,7 +15,7 @@ public plugin_init()
 {
   register_plugin("[JAIL] Block CT", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_block_ct = my_register_cvar("jail_block_ct", "2", "Block CT 0/1/2 off/MySQL/Sqlite. (Default: 2)");
+  cvar_block_ct = register_cvar_file("jail_block_ct", "2", "Block CT 0/1/2 off/MySQL/Sqlite. (Default: 2)");
   set_client_commands("block", "cmd_show_block");
   RegisterHamPlayer(Ham_Spawn, "Ham_Spawn_pre", 0);
 }

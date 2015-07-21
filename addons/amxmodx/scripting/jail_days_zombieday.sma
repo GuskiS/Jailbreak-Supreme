@@ -64,10 +64,10 @@ public plugin_init()
 {
   register_plugin("[JAIL] Zombie day", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_zombie_time_delay =  my_register_cvar("jail_zombie_time_delay",  "20.0",   "Time before start of Zombie day. (Default: 20.0)");
-  cvar_zombie_health =      my_register_cvar("jail_zombie_health",      "450",    "Zombie health. (Default: 450)");
-  cvar_zombie_speed =       my_register_cvar("jail_zombie_speed",       "300.0",  "Zombie speed. (Default: 300.0)");
-  cvar_zombie_gravity =     my_register_cvar("jail_zombie_gravity",     "0.65",   "Zombie gravity. (Default: 0.65)");
+  cvar_zombie_time_delay =  register_cvar_file("jail_zombie_time_delay",  "20.0",   "Time before start of Zombie day. (Default: 20.0)");
+  cvar_zombie_health =      register_cvar_file("jail_zombie_health",      "450",    "Zombie health. (Default: 450)");
+  cvar_zombie_speed =       register_cvar_file("jail_zombie_speed",       "300.0",  "Zombie speed. (Default: 300.0)");
+  cvar_zombie_gravity =     register_cvar_file("jail_zombie_gravity",     "0.65",   "Zombie gravity. (Default: 0.65)");
 
   DisableHamForward((g_pHamHooks[0] = RegisterHamPlayer(Ham_TraceAttack, "Ham_TraceAttack_pre", 0)));
   DisableHamForward((g_pHamHooks[1] = RegisterHamPlayer(Ham_TakeDamage, "Ham_TakeDamage_pre", 0)));

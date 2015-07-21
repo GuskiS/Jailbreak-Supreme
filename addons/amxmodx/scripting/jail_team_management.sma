@@ -16,9 +16,9 @@ public plugin_init()
 {
   register_plugin("[JAIL] Team management", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_change_team  = my_register_cvar("jail_change_team",  "3", "Who can change team: 0-noone, 1-admins, 2-ct, 3-admins+ct, 4-all. (Default: 3)");
-  cvar_ct_max       = my_register_cvar("jail_ct_max",       "7", "Max number guards. (Default: 7)");
-  cvar_ct_ratio     = my_register_cvar("jail_ct_ratio",     "3", "Ratio for guards, for every X prisoners 1 guard. (Default: 3)");
+  cvar_change_team  = register_cvar_file("jail_change_team",  "3", "Who can change team: 0-noone, 1-admins, 2-ct, 3-admins+ct, 4-all. (Default: 3)");
+  cvar_ct_max       = register_cvar_file("jail_ct_max",       "7", "Max number guards. (Default: 7)");
+  cvar_ct_ratio     = register_cvar_file("jail_ct_ratio",     "3", "Ratio for guards, for every X prisoners 1 guard. (Default: 3)");
 
   register_clcmd("jointeam", "cmd_block");
   register_clcmd("joinclass", "cmd_block");

@@ -4,6 +4,7 @@
 #define _jail_included
 
 #include <jailbreak_const>
+#include <api_register_cvar_file>
 
 #if AMXX_VERSION_NUM >= 175
     #pragma reqlib jailbreak

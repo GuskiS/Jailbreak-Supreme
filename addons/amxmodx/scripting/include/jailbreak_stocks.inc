@@ -3,6 +3,19 @@
 #endif
 #define _jail_stocks_included
 
+stock default_cvars()
+{
+  set_pcvar_string(get_cvar_pointer("api_rcf_file_name"), JAIL_CONFIGFILE);
+  register_cvar_file("mp_tkpunish",         "0", "Disables TeamKill punishments");
+  register_cvar_file("mp_friendlyfire",     "0", "Disables friendly fire");
+  register_cvar_file("mp_limitteams",       "0", "Disables team limits");
+  register_cvar_file("mp_autoteambalance",  "0", "Disables team limits");
+  register_cvar_file("mp_freezetime",       "0", "Disables freeze time on round start");
+  register_cvar_file("mp_playerid",         "2", "Disables team info when aiming on player");
+  register_cvar_file("sv_allktalk",         "1", "Enables alltalk");
+  register_cvar_file("amx_statscfg",        "off PlayerName", "Disables player name when aiming on player");
+}
+
 stock is_jailmap()
 {
   static mapname[32];
@@ -26,65 +39,6 @@ stock set_player_model(id, model[], skin)
 
   entity_set_int(id, EV_INT_skin, skin);
   jail_set_playerdata(id, PD_SKIN, skin);
-}
-
-stock my_register_cvar(name[], string[], description[], flags = 0, Float:fvalue = 0.0)
-{
-  jail_register_cvar(name, string, description);
-  return register_cvar(name, string, flags, fvalue);
-}
-
-stock auto_exec_config(const szName[], bool:bAutoCreate=true)
-{
-  new szFileName[32];
-  new iLen = copy(szFileName, charsmax(szFileName), szName);
-  if(iLen <= 4 || !equal(szFileName[iLen-4], ".cfg"))
-    add(szFileName, charsmax(szFileName), ".cfg");
-
-  new szConfigPath[96];
-  get_localinfo("amxx_configsdir", szConfigPath, charsmax(szConfigPath));
-  format(szConfigPath, charsmax(szConfigPath), "%s/%s", szConfigPath, szFileName);
-
-  if(file_exists(szConfigPath))
-  {
-    server_cmd("exec %s", szConfigPath);
-    server_exec();
-    return 1;
-  }
-  else if(bAutoCreate)
-  {
-    new fp = fopen(szConfigPath, "wt");
-    if(!fp)
-      return -1;
-    new szPluginFileName[96], szPluginName[64], szAuthor[32], szVersion[32], szStatus[2];
-    new iPlugin = get_plugin(-1,
-          szPluginFileName, charsmax(szPluginFileName),
-          szPluginName, charsmax(szPluginName),
-          szVersion, charsmax(szVersion),
-          szAuthor, charsmax(szAuthor),
-          szStatus, charsmax(szStatus));
-
-    fprintf(fp, "; ^"%s^" onfiguration file^n", szPluginName);
-    fprintf(fp, "; Author : ^"%s^"^n", szAuthor);
-    fprintf(fp, "; Version : ^"%s^"^n", szVersion);
-    fprintf(fp, "; File : ^"%s^"^n", szPluginFileName);
-
-    new iMax;
-    iMax = get_plugins_cvarsnum();
-    new iTempId, iPcvar, szCvarName[256], szCvarValue[128], i;
-    for(i = 0; i<iMax; i++)
-    {
-      get_plugins_cvar(i, szCvarName, charsmax(szCvarName), _, iTempId, iPcvar);
-      if(iTempId == iPlugin)
-      {
-        get_pcvar_string(iPcvar, szCvarValue, charsmax(szCvarValue));
-        fprintf(fp, "%s ^"%s^"^n", szCvarName, szCvarValue);
-      }
-    }
-
-    fclose(fp);
-  }
-  return 0;
 }
 
 stock strip_weapons(id)

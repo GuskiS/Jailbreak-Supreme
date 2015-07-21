@@ -63,8 +63,8 @@ public plugin_init()
 {
   register_plugin("[JAIL] Achievments API", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_achievments      = my_register_cvar("jail_achievments",      "2",  "Achievements 0/1/2 off/MySQL/Sqlite. (Default: 2)");
-  cvar_achievments_page = my_register_cvar("jail_achievments_page", "",   "Show achievements in web page. (Default: '')");
+  cvar_achievments      = register_cvar_file("jail_achievments",      "2",  "Achievements 0/1/2 off/MySQL/Sqlite. (Default: 2)");
+  cvar_achievments_page = register_cvar_file("jail_achievments_page", "",   "Show achievements in web page. (Default: '')");
   // http://heal.lv/achievments.php?server=jail&user_name=%name%
 
   set_client_commands("played", "cmd_show_playtime");

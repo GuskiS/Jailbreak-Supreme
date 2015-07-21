@@ -38,8 +38,8 @@ public plugin_init()
 {
   register_plugin("[JAIL] Duel extra: RPG", JAIL_VERSION, JAIL_AUTHOR);
 
-  cvar_rpg_velocity = my_register_cvar("jail_rpg_velocity", "800", "Bazookas speed. (Default: 800)");
-  cvar_rpg_multi    = my_register_cvar("jail_rpg_multi",    "1.1", "Bazookas damage multiplier. (Default: 1.1)");
+  cvar_rpg_velocity = register_cvar_file("jail_rpg_velocity", "800", "Bazookas speed. (Default: 800)");
+  cvar_rpg_multi    = register_cvar_file("jail_rpg_multi",    "1.1", "Bazookas damage multiplier. (Default: 1.1)");
 
   DisableHamForward((g_pHamForwards[0] = RegisterHam(Ham_Think, "grenade", "Ham_Think_pre", 1)));
   DisableHamForward((g_pHamForwards[1] = RegisterHam(Ham_Think, "grenade", "Ham_Think_post", 1)));

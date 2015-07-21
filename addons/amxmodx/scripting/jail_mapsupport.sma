@@ -70,7 +70,7 @@ public plugin_init()
     g_aDoors = ArrayCreate();
     setup_buttons();
 
-    cvar_shoot_buttons = my_register_cvar("jail_shoot_buttons", "1", "Shootable buttons. (Default: 1)");
+    cvar_shoot_buttons = register_cvar_file("jail_shoot_buttons", "1", "Shootable buttons. (Default: 1)");
     set_client_commands("open", "jail_cmd_open");
     set_client_commands("close", "jail_cmd_close");
     RegisterHam(Ham_TraceAttack, "func_button", "Ham_TraceAttack_pre", 0);
